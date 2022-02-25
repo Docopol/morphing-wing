@@ -4,7 +4,10 @@ import pandas as pd
 
 
 def main():
-    pass
+    """
+    Main
+    """
+    print("Hell world")
 
 
 if __name__ == "__main__":
