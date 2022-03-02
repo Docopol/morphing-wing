@@ -2,4 +2,4 @@
 
 ## sources
 
-[scikit-image.transform] (https://scikit-image.org/docs/dev/api/skimage.transform.html)
+[scikit-image.transform](https://scikit-image.org/docs/dev/api/skimage.transform.html)
