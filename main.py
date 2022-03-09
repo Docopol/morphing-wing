@@ -122,6 +122,6 @@ if __name__ == "__main__":
     version = platform.python_version_tuple()
     if int(version[0]) < 3:
         raise Exception(f"Must be using Python +3.7. Current version Python {version[0]}.{version[1]}.{version[2]}")
-    if int(version[1]) < 5:
+    if int(version[1]) < 7:
         raise Exception(f"Must be using Python +3.7. Current version Python {version[0]}.{version[1]}.{version[2]}")
     main()
