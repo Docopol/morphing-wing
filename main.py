@@ -47,6 +47,7 @@ def main():
 
     data = load_file("Data/DispAndForce/CurentVoltageReading3.txt")
     data1 = load_file("Data/Experimental strains/Measurements2014_05_22.txt", 4)
+    data2 = load_file("Data/FEM/shell_loadstep3_str.out")
 
     print(f"{files_dap}")
     print(f"{files_es}")
@@ -56,6 +57,7 @@ def main():
 
     print(f"{data}")
     print(f"{data1}")
+    print(f"{data2}")
 
 
 if __name__ == "__main__":
