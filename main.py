@@ -95,13 +95,13 @@ def main():
     data = load_file("Data/DispAndForce/CurentVoltageReading3.txt")
     data1 = load_file("Data/Experimental strains/Measurements2014_05_22.txt", 4)
 
-    print(f"{files_dap=}")
-    print(f"{files_es=}")
-    print(f"{files_fem=}")
-    print(f"{files_md=}")
+    print(f"{files_dap}")
+    print(f"{files_es}")
+    print(f"{files_fem}")
+    print(f"{files_md}")
 
-    print(f"{data=}")
-    print(f"{data1=}")
+    print(f"{data}")
+    print(f"{data1}")
 
     file = pd.read_csv("Data/ModelData/target_shape.csv")
     file2 = pd.read_csv("Data/ModelData/target_shape.csv")
