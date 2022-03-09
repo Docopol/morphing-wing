@@ -34,54 +34,6 @@ def perftimer(func):
     return wrapper
 
 
-class Plotter:
-
-    def __init__(self, x, y, x_label, y_label, legend_labels=None) -> None:
-        if any(isinstance(i, list) for i in x):
-            self.x = x
-            self.y = y
-        if any(isinstance(i, pd.DataFrame) for i in x):
-            self.x = x
-            self.y = y
-        if any(isinstance(i, pd.Series) for i in x):
-            self.x = x
-            self.y = y
-        else:
-            self.x = [x]
-            self.y = [y]
-        self.x_label = str(x_label)
-        self.y_label = str(y_label)
-        if legend_labels:
-            self.legend = legend_labels
-        else:
-            self.legend = [None] * 2
-
-    def plotgraphs(self):
-        for i, j, k in zip(self.x, self.y, self.legend):
-            print("loop")
-            if len(i) != len(j):
-                raise Exception(f"Can't create graph, with irregular points ({len(i)}x{len(j)})")
-            if k:
-                plt.plot(i, j, label=self.legend)
-            else:
-                plt.plot(i, j)
-        plt.ylabel(self.y_label)
-        plt.xlabel(self.x_label)
-        if None not in self.legend:
-            plt.legend()
-        plt.show()
-
-    @classmethod
-    def commaformat(cls,):
-        pass
-
-    def __str__(self):
-        pass
-
-    def __repr__(self):
-        pass
-
-
 @perftimer
 def main():
     """
@@ -91,31 +43,21 @@ def main():
     files_es = files_in_directory("Experimental strains", "txt")
     files_fem = files_in_directory("FEM", "out")
     files_md = files_in_directory("ModelData", "txt")
+    files_img_bmp = files_in_directory("Images (BMP) - FOR IMAGE CALIBRATION ONLY", "bmp")
 
     data = load_file("Data/DispAndForce/CurentVoltageReading3.txt")
     data1 = load_file("Data/Experimental strains/Measurements2014_05_22.txt", 4)
+    data2 = load_file("Data/FEM/shell_loadstep3_str.out")
 
     print(f"{files_dap}")
     print(f"{files_es}")
     print(f"{files_fem}")
     print(f"{files_md}")
+    print(f"{files_img_bmp}")
 
     print(f"{data}")
     print(f"{data1}")
-
-    file = pd.read_csv("Data/ModelData/target_shape.csv")
-    file2 = pd.read_csv("Data/ModelData/target_shape.csv")
-    a = [file["x[mm]"], file2["y[mm]"]]
-    b = [file["y[mm]"], file2["x[mm]"]]
-    a = [1,2,3]
-    b = [1,2,3]
-
-    plot = Plotter(a,b,"x","y")
-    plot.plotgraphs()
-    print(plot.__dict__)
-    # print(plot.x[0])
-    # print("----")
-    # print(plot.x[1])
+    print(f"{data2}")
 
 
 if __name__ == "__main__":
