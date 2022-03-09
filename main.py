@@ -43,6 +43,7 @@ def main():
     files_es = files_in_directory("Experimental strains", "txt")
     files_fem = files_in_directory("FEM", "out")
     files_md = files_in_directory("ModelData", "txt")
+    files_img_bmp = files_in_directory("Images (BMP) - FOR IMAGE CALIBRATION ONLY", "bmp")
 
     data = load_file("Data/DispAndForce/CurentVoltageReading3.txt")
     data1 = load_file("Data/Experimental strains/Measurements2014_05_22.txt", 4)
@@ -51,12 +52,10 @@ def main():
     print(f"{files_es}")
     print(f"{files_fem}")
     print(f"{files_md}")
+    print(f"{files_img_bmp}")
 
     print(f"{data}")
     print(f"{data1}")
-
-    file = pd.read_csv("Data/ModelData/target_shape.csv")
-    file2 = pd.read_csv("Data/ModelData/target_shape.csv")
 
 
 if __name__ == "__main__":
