@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 
 from PIL import Image
 
-from main import perftimer
-from main import files_in_directory
+from utils.other import perftimer
+from utils.filereader import files_in_directory
 
 
 @perftimer

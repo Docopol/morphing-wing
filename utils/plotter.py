@@ -28,9 +28,11 @@ class Plotter:
         else:
             self.legend = [None] * 2
 
-    def plotgraphs(self):
+    def plotgraphs(self) -> None:
+        """
+        call this function to plot the graphs related to this class
+        """
         for i, j, k in zip(self.x, self.y, self.legend):
-            print("loop")
             if len(i) != len(j):
                 raise Exception(f"Can't create graph, with irregular points ({len(i)}x{len(j)})")
             if k:
