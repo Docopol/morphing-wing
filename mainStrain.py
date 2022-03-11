@@ -4,15 +4,14 @@ import main
 import pandas as pd
 import processFEMStrainData 
 
-a = processFEMStrainData.strainData1s
-b = processFEMStrainData.strainData2s
+femStrainData1s = processFEMStrainData.strainData1s
+femStrainData2s = processFEMStrainData.strainData2s
 
 def load_file(file: str, skip_rows: int = None):
     data_file = pd.read_csv(file, sep="\t", skiprows=skip_rows)
     return data_file
 
 
-print(a)
 
 '''
 data2 = load_file("Data/FEM/shell_loadstep3_str.out")
