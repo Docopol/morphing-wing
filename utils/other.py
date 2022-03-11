@@ -11,6 +11,6 @@ def perftimer(func):
         start = time.time()
         outcome = func(*args, **kwargs)
         stop = time.time() - start
-        print(f"--- Process {func.__name__} ran in: {stop}s ---")
+        print(f"--- Process {func.__name__} ran in: {stop:.5f}s ---")
         return outcome
     return wrapper
