@@ -11,12 +11,13 @@ dataFileNames = ['loadstep1_str', 'loadstep2_str', 'loadstep3_str', 'loadstep4_s
 exampleDatas = load_file("Data/FEM/shell_loadstep4_str.out") #call function to insert data
 exampleDatas = exampleDatas.to_numpy() #convert into numpy arraw with 1 column
 
-def processFEMStrainData (datas:np.ndarray): #convert into numpy array with several columns
-    returnedArray = np.zeros((np.shape(datas)[0],7))
+def processFEMStrainData (datas:np.ndarray, loadStepNumber_i:int): #convert into numpy array with several columns
     for i in range(np.shape(datas)[0]):
-        if i %
-        returnedArray [i] = [datas[i,0][3:8], datas[i,0][9:21], datas[i,0][21:33], datas[i,0][33:45], datas[i,0][45:57], datas[i,0][57:69], datas[i,0][69:81]]
-    return returnedArray #:numpy.ndarray
+        if i % 2 == 0:
+            strainData1s [loadStepNumber_i][int(i/2)] = [datas[i,0][3:8], datas[i,0][9:21], datas[i,0][21:33], datas[i,0][33:45], datas[i,0][45:57], datas[i,0][57:69], datas[i,0][69:81]]
+        elif i % 2 == 1:
+            strainData2s [loadStepNumber_i][(int((i-1)/2))] = [datas[i,0][3:8], datas[i,0][9:21], datas[i,0][21:33], datas[i,0][33:45], datas[i,0][45:57], datas[i,0][57:69], datas[i,0][69:81]]
+    return 
 
 '''
 strainData1s and strainData2s are numpy arraws with [loadstepnumber - 1] [nodenumber - 11651, data column (node number, x, y, z, xy, yz, zx)]
@@ -29,7 +30,5 @@ strainData2s = np.zeros((5,int(np.shape(exampleDatas)[0]/2),7))
 for i in dataFileNames:
     importedDatas = load_file("Data/FEM/shell_"+i+".out")
     importedDatas = importedDatas.to_numpy()
-    processFEMStrainData (importedDatas)
-    print(importedDatas)
-
-#print (data2)
+    processFEMStrainData (importedDatas, int(i[8])-1)
+print (strainData2s)
