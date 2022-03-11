@@ -5,3 +5,7 @@ ___
 * identify the line based on hardcoded rgb value
 * image processing to evenout color values
 * 
+
+___
+#### Experimental Strain Data 
+* Divide timestep data into the existing pairs of wing "loops"
