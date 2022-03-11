@@ -9,24 +9,19 @@ from utils.filereader import files_in_directory
 
 
 @perftimer
-def imageVisualization(file, show_colorbar:bool = False, grayscale: bool = False) -> None:
+def imageVisualization(file, show_colorbar:bool = False) -> None:
     """
     visualization an image using plt.imshow()
     """
-    if grayscale:
-        plt.imshow(file, cmap="gray", vmin=0, vmax=255)
-    else:
-        plt.imshow(file)
+    plt.imshow(file)
     if show_colorbar:
         plt.colorbar()
     plt.show()
 
 
 @perftimer
-def loadRGBandBOOL(file: str, grayscale: bool = False, usepil: bool = False) -> list:
-    if grayscale:
-        image_colordata = Image.open(file).convert("L")
-    elif usepil:
+def loadRGBandBOOL(file: str, usepil: bool = False) -> list:
+    if usepil:
         image_colordata = Image.open(file)
     else:
         image_colordata = plt.imread(file)
@@ -34,10 +29,17 @@ def loadRGBandBOOL(file: str, grayscale: bool = False, usepil: bool = False) -> 
     return [np.asarray(image_colordata), file_bool]
 
 
+def cropimage(array: np.ndarray) -> np.ndarray:
+    pass
+
+
+def creategridd():
+    pass
+
+
 images = files_in_directory("Images (BMP) - FOR IMAGE CALIBRATION ONLY", "bmp")
 image = loadRGBandBOOL(images[-1])
-
+print(np.unique(image[0], axis=0, return_counts=True))
 imageVisualization(image[0])
 imageVisualization(image[1])
-print(np.asarray(image[0]))
 # print(image[0][1000:1500, 1000:2000])
