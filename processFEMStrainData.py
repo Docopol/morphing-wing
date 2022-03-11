@@ -31,4 +31,4 @@ for i in dataFileNames:
     importedDatas = load_file("Data/FEM/shell_"+i+".out")
     importedDatas = importedDatas.to_numpy()
     processFEMStrainData (importedDatas, int(i[8])-1)
-print (strainData2s)
+print (strainData1s)
