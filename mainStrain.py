@@ -90,12 +90,12 @@ plt.legend()
 
 # strain data difference of data 1 and 2
 plt.subplot(2, 2, 3)
-plt.plot(femNodeLocation[1 - 1], abs(abs(femStrainData1s[1 - 1][2:, 4]) - femStrainData2s[1 - 1][2:, 4]),
+plt.plot(femNodeLocation[1 - 1], abs(abs(femStrainData1s[1 - 1][2:, 4]) - abs(femStrainData2s[1 - 1][2:, 4])),
          label="loadstep 1")
-plt.plot(femNodeLocation[2 - 1], abs(femStrainData1s[2 - 1][2:, 4] - femStrainData2s[2 - 1][2:, 4]), label="loadstep 2")
-plt.plot(femNodeLocation[3 - 1], abs(femStrainData1s[3 - 1][2:, 4] - femStrainData2s[3 - 1][2:, 4]), label="loadstep 3")
-plt.plot(femNodeLocation[4 - 1], abs(femStrainData1s[4 - 1][2:, 4] - femStrainData2s[4 - 1][2:, 4]), label="loadstep 4")
-plt.plot(femNodeLocation[5 - 1], abs(femStrainData1s[5 - 1][2:, 4] - femStrainData2s[5 - 1][2:, 4]), label="loadstep 5")
+plt.plot(femNodeLocation[2 - 1], abs(abs(femStrainData1s[2 - 1][2:, 4]) - abs(femStrainData2s[2 - 1][2:, 4])), label="loadstep 2")
+plt.plot(femNodeLocation[3 - 1], abs(abs(femStrainData1s[3 - 1][2:, 4]) - abs(femStrainData2s[3 - 1][2:, 4])), label="loadstep 3")
+plt.plot(femNodeLocation[4 - 1], abs(abs(femStrainData1s[4 - 1][2:, 4]) - abs(femStrainData2s[4 - 1][2:, 4])), label="loadstep 4")
+plt.plot(femNodeLocation[5 - 1], abs(abs(femStrainData1s[5 - 1][2:, 4]) - abs(femStrainData2s[5 - 1][2:, 4])), label="loadstep 5")
 plt.legend()
 plt.show()
 
