@@ -27,18 +27,21 @@ def reformatFile(data_file: pd.DataFrame) -> np.ndarray:
     return data_file_reformat
 
 
-def nodeDistance(data_file: np.ndarray) -> np.ndarray:
+def nodeDistanceAndOrientation(data_file: np.ndarray):
     nr_rows = len(data_file[:, 0])
 
     node_distance = np.zeros((nr_rows, 1))
+    node_orientation = np.zeros(nr_rows)
     for data_file_row in range(0, nr_rows - 1):
         dx = (data_file[data_file_row + 1, 1] + data_file[data_file_row + 1, 4]) - (
                 data_file[data_file_row, 1] + data_file[data_file_row, 4])
         dy = (data_file[data_file_row + 1, 2] + data_file[data_file_row + 1, 5]) - (
                 data_file[data_file_row, 2] + data_file[data_file_row, 5])
         node_distance[data_file_row, 0] = np.sqrt(dx ** 2 + dy ** 2)
+        node_orientation[data_file_row] = np.arctan(dy/dx)
 
-    return node_distance
+    return node_distance, node_orientation
+
 
 
 def nodeLocation(node_distances: np.ndarray) -> np.ndarray:
@@ -54,11 +57,11 @@ loadstep3_disp = reformatFile(readFile("Data/FEM/shell_loadstep3_disp.out"))[2:,
 loadstep4_disp = reformatFile(readFile("Data/FEM/shell_loadstep4_disp.out"))[2:, :]
 loadstep5_disp = reformatFile(readFile("Data/FEM/shell_loadstep5_disp.out"))[2:, :]
 
-loadstep1_disp_nodes = nodeDistance(loadstep1_disp)
-loadstep2_disp_nodes = nodeDistance(loadstep2_disp)
-loadstep3_disp_nodes = nodeDistance(loadstep3_disp)
-loadstep4_disp_nodes = nodeDistance(loadstep4_disp)
-loadstep5_disp_nodes = nodeDistance(loadstep5_disp)
+loadstep1_disp_nodes, loadstep1_node_orientation = nodeDistanceAndOrientation(loadstep1_disp)
+loadstep2_disp_nodes, loadstep2_node_orientation = nodeDistanceAndOrientation(loadstep2_disp)
+loadstep3_disp_nodes, loadstep3_node_orientation = nodeDistanceAndOrientation(loadstep3_disp)
+loadstep4_disp_nodes, loadstep4_node_orientation = nodeDistanceAndOrientation(loadstep4_disp)
+loadstep5_disp_nodes, loadstep5_node_orientation = nodeDistanceAndOrientation(loadstep5_disp)
 
 loadstep1_disp_loc = nodeLocation(loadstep1_disp_nodes)
 loadstep2_disp_loc = nodeLocation(loadstep2_disp_nodes)
@@ -66,22 +69,25 @@ loadstep3_disp_loc = nodeLocation(loadstep3_disp_nodes)
 loadstep4_disp_loc = nodeLocation(loadstep4_disp_nodes)
 loadstep5_disp_loc = nodeLocation(loadstep5_disp_nodes)
 
-# print(sum(loadstep1_disp_nodes[2:, 0]))
+# print(sum(loadstep1_disp_nodes))
 # print(sum(loadstep2_disp_nodes))
 # print(sum(loadstep3_disp_nodes))
 # print(sum(loadstep4_disp_nodes))
 # print(sum(loadstep5_disp_nodes))
 
-plt.scatter(loadstep1_disp[:, 1] + loadstep1_disp[:, 4], loadstep1_disp[:, 2] + loadstep1_disp[:, 5],
-            label="Loadstep 1")
-plt.scatter(loadstep2_disp[:, 1] + loadstep2_disp[:, 4], loadstep2_disp[:, 2] + loadstep2_disp[:, 5],
-            label="Loadstep 2")
-plt.scatter(loadstep3_disp[:, 1] + loadstep3_disp[:, 4], loadstep3_disp[:, 2] + loadstep3_disp[:, 5],
-            label="Loadstep 3")
-plt.scatter(loadstep4_disp[:, 1] + loadstep4_disp[:, 4], loadstep4_disp[:, 2] + loadstep4_disp[:, 5],
-            label="Loadstep 4")
-plt.scatter(loadstep5_disp[:, 1] + loadstep5_disp[:, 4], loadstep5_disp[:, 2] + loadstep5_disp[:, 5],
-            label="Loadstep 5")
 
-plt.legend()
-plt.show()
+'''Below plots the leading edge shapes for 5 loadsteps'''
+
+# plt.scatter(loadstep1_disp[:, 1] + loadstep1_disp[:, 4], loadstep1_disp[:, 2] + loadstep1_disp[:, 5],
+#             label="Loadstep 1")
+# plt.scatter(loadstep2_disp[:, 1] + loadstep2_disp[:, 4], loadstep2_disp[:, 2] + loadstep2_disp[:, 5],
+#             label="Loadstep 2")
+# plt.scatter(loadstep3_disp[:, 1] + loadstep3_disp[:, 4], loadstep3_disp[:, 2] + loadstep3_disp[:, 5],
+#             label="Loadstep 3")
+# plt.scatter(loadstep4_disp[:, 1] + loadstep4_disp[:, 4], loadstep4_disp[:, 2] + loadstep4_disp[:, 5],
+#             label="Loadstep 4")
+# plt.scatter(loadstep5_disp[:, 1] + loadstep5_disp[:, 4], loadstep5_disp[:, 2] + loadstep5_disp[:, 5],
+#             label="Loadstep 5")
+#
+# plt.legend()
+# plt.show()

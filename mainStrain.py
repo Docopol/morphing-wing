@@ -13,11 +13,28 @@ e.g. strainData1s [2][:,2] -> gives the y strain data from data set 1 for the 3r
 '''
 femStrainData1s = processFEMStrainData.strainData1s
 femStrainData2s = processFEMStrainData.strainData2s
+
 loadstep1_disp_loc = mainFEMdisp.loadstep1_disp_loc
 loadstep2_disp_loc = mainFEMdisp.loadstep2_disp_loc
 loadstep3_disp_loc = mainFEMdisp.loadstep3_disp_loc
 loadstep4_disp_loc = mainFEMdisp.loadstep4_disp_loc
 loadstep5_disp_loc = mainFEMdisp.loadstep5_disp_loc
+
+loadstep1_node_orientation = mainFEMdisp.loadstep1_node_orientation
+loadstep2_node_orientation = mainFEMdisp.loadstep2_node_orientation
+loadstep3_node_orientation = mainFEMdisp.loadstep3_node_orientation
+loadstep4_node_orientation = mainFEMdisp.loadstep4_node_orientation
+loadstep5_node_orientation = mainFEMdisp.loadstep5_node_orientation
+
+# ____Plot the the orientations for each node___
+# plt.plot(loadstep1_disp_loc, loadstep1_node_orientation)
+# plt.plot(loadstep2_disp_loc, loadstep2_node_orientation)
+# plt.plot(loadstep3_disp_loc, loadstep3_node_orientation)
+# plt.plot(loadstep4_disp_loc, loadstep4_node_orientation)
+# plt.plot(loadstep5_disp_loc, loadstep5_node_orientation)
+# plt.show()
+
+print(loadstep1_node_orientation)
 
 def load_file(file: str, skip_rows: int = None):
     data_file = pd.read_csv(file, sep="\t", skiprows=skip_rows)
@@ -26,14 +43,14 @@ def load_file(file: str, skip_rows: int = None):
 data2 = load_file("Data/FEM/shell_loadstep3_str.out")
 data2 = pd.DataFrame(data2).to_numpy()
 
-print(data2)
+# print(data2)
 
 
 
 
 #expData = np.genfromtxt("Data/Experimental Strains/Measurements2014_05_22.csv", delimiter=',')
 expData = pd.DataFrame(load_file("Data/Experimental Strains/Measurements2014_05_22.csv")).to_numpy
-print(expData)
+# print(expData)
 
 
 '''
@@ -57,9 +74,6 @@ v v make graphs v v
 #        ylim=(0, 8), yticks=np.arange(1, 8))
 #
 # ax[0,1].set_title('Bending Analyis FEM')
-
-print(mainFEMdisp.loadstep1_disp_loc)
-print(processFEMStrainData.strainData1s[1-1][2:, 4])
 
 # strain data 1
 plt.subplot(2, 2, 1)
