@@ -8,4 +8,5 @@ ___
 
 ___
 #### Experimental Strain Data 
-* Divide timestep data into the existing pairs of wing "loops"
+* Do the experimental couples divison fully.
+* Write final function of the section division and return single array.
