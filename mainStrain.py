@@ -16,23 +16,6 @@ femStrainData2s = processFEMStrainData.strainData2s
 
 
 
-def load_file(file: str, skip_rows: int = None):
-    data_file = pd.read_csv(file, sep="\t", skiprows=skip_rows)
-    return data_file
-
-data2 = load_file("Data/FEM/shell_loadstep3_str.out")
-data2 = pd.DataFrame(data2).to_numpy()
-
-print(data2)
-
-
-
-
-#expData = np.genfromtxt("Data/Experimental Strains/Measurements2014_05_22.csv", delimiter=',')
-expData = pd.DataFrame(load_file("Data/Experimental Strains/Measurements2014_05_22.csv")).to_numpy
-print(expData)
-
-
 '''
 v v make graphs v v
 '''
@@ -47,32 +30,31 @@ ax[0,0].set(xlim=(0, 8), xticks=np.arange(1, 8),
 
 ax[0,0].set_title('Bending Analyis FEM')
 
-# symmetry analyis plot FEM
+# symmetry analyis plot Experiment
 ax[0,1].plot(x1, y1, linewidth=2.0, label = 'sin', color = 'orange')
 
 ax[0,1].set(xlim=(0, 8), xticks=np.arange(1, 8),
        ylim=(0, 8), yticks=np.arange(1, 8))
 
-ax[0,1].set_title('Bending Analyis FEM')
-
-
+ax[0,1].set_title('Bending Analyis Experiment')
 
 # FEM vs experimental data
 ax[1,0].plot(x1, y1, linewidth=2.0, label = 'sin', color = 'orange')
 ax[1,0].plot(x1, y2, linewidth=2.0, label = 'cos',  color = 'blue' ) 
 
-ax[1,0].set(xlim=(0, 8), xticks=np.arange(1, 8),
-       ylim=(0, 8), yticks=np.arange(1, 8))
+#ax[1,0].set(xlim=(0, 8), xticks=np.arange(1, 8), ylim=(0, 8), yticks=np.arange(1, 8))
 
-ax[1,0].legend(['sin','cos'])
+ax[1,0].legend(['FEM','Experiment'])
 
+ax[1,0].set_title('FEM vs experimental analysis')
 
 #asymmetry over time (optional)
 ax[1,1].plot(x1, y2, linewidth=2.0, label = 'cos', color = 'blue')
 
-
 ax[1,1].set(xlim=(0, 8), xticks=np.arange(1, 8),
        ylim=(0, 8), yticks=np.arange(1, 8))
+
+ax[1,2].set_title('Bending Analyis over Time Experiment')
 
 
 plt.show()
