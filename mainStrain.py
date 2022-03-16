@@ -14,8 +14,6 @@ e.g. strainData1s [2][:,2] -> gives the y strain data from data set 1 for the 3r
 femStrainData1s = processFEMStrainData.strainData1s
 femStrainData2s = processFEMStrainData.strainData2s
 
-
-
 '''
 v v make graphs v v
 '''
