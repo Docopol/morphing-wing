@@ -1,43 +1,20 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
-# make data
-x1 = np.linspace(0, 10, 100)
-y1 = 4 + 2 * np.sin(2 * x1)
-y2 = 4 + 2 * np.cos(2 * x1)
-
-# plot
-
-
-# symmetry (bending analysis), FEm vs experimental, time vs asymetry (optional)
-fig, ax = plt.subplots(2,2)
-
-# symmetry analyis plot
-
-ax[0,0].plot(x1, y1, linewidth=2.0, label = 'sin', color = 'orange')
-
-ax[0,0].set(xlim=(0, 8), xticks=np.arange(1, 8),
-       ylim=(0, 8), yticks=np.arange(1, 8))
-
-ax[0,0].set_title('Sample Title')
-
-# FEM vs experimental data
-
-ax[1,0].plot(x1, y1, linewidth=2.0, label = 'sin', color = 'orange')
-ax[1,0].plot(x1, y2, linewidth=2.0, label = 'cos',  color = 'blue' ) 
-
-ax[1,0].set(xlim=(0, 8), xticks=np.arange(1, 8),
-       ylim=(0, 8), yticks=np.arange(1, 8))
-
-ax[1,0].legend(['sin','cos'])
+import processFEMStrainData
+import mainFEMdisp
+'''
+femStrainData1s and femStrainData2s are numpy arrays with [loadstepnumber - 1] [nodenumber - 11651, data column (node number, x, y, z, xy, yz, zx)]
+e.g. strainData1s [2][:,2] -> gives the y strain data from data set 1 for the 3rd loadstep 
+- Ask Mick if confused
+'''
+femStrainData1s = processFEMStrainData.strainData1s
+femStrainData2s = processFEMStrainData.strainData2s
 
 
-#asymmetry over time (optional)
-ax[1,1].plot(x1, y2, linewidth=2.0, label = 'cos', color = 'blue')
+posNodes = np.array([mainFEMdisp.loadstep1_disp, mainFEMdisp.loadstep2_disp, mainFEMdisp.loadstep3_disp, mainFEMdisp.loadstep4_disp, mainFEMdisp.loadstep5_disp, mainFEMdisp.loadstep5_disp])
+#first 2 data points ommitted
+
+print(np.shape(posNodes[1]))
+print(np.shape (femStrainData1s))
 
 
-ax[1,1].set(xlim=(0, 8), xticks=np.arange(1, 8),
-       ylim=(0, 8), yticks=np.arange(1, 8))
-
-
-plt.show()
