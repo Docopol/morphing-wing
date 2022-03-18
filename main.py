@@ -1,35 +1,16 @@
-import platform
+# This is a sample Python script.
 
-import utils
+# Press Shift+F10 to execute it or replace it with your code.
+# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 
-def main():
-    """
-    Main
-    """
-    files_dap = utils.filereader.files_in_directory("DispAndForce", "txt")
-    files_es = utils.filereader.files_in_directory("Experimental strains", "txt")
-    files_fem = utils.filereader.files_in_directory("FEM", "out")
-    files_md = utils.filereader.files_in_directory("ModelData", "txt")
-    files_img_bmp = utils.filereader.files_in_directory("Images (BMP) - FOR IMAGE CALIBRATION ONLY", "bmp")
+def print_hi(name):
+    # Use a breakpoint in the code line below to debug your script.
+    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
-    data = utils.filereader.load_file("Data/DispAndForce/CurentVoltageReading3.txt")
-    data1 = utils.filereader.load_file("Data/Experimental strains/Measurements2014_05_22.txt", 4)
 
-    print(f"{files_dap}")
-    print(f"{files_es}")
-    print(f"{files_fem}")
-    print(f"{files_md}")
-    print(f"{files_img_bmp}")
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+    print_hi('PyCharm')
 
-    print(f"{data}")
-    print(f"{data1}")
-    
-
-if __name__ == "__main__":
-    version = platform.python_version_tuple()
-    if int(version[0]) < 3:
-        raise Exception(f"Must be using Python +3.7. Current version Python {version[0]}.{version[1]}.{version[2]}")
-    if int(version[1]) < 7:
-        raise Exception(f"Must be using Python +3.7. Current version Python {version[0]}.{version[1]}.{version[2]}")
-    main()
+# See PyCharm help at https://www.jetbrains.com/help/pycharm/
