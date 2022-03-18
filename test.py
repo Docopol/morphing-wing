@@ -12,11 +12,19 @@ femStrainData2s = processFEMStrainData.strainData2s
 
 posNodes = np.array([mainFEMdisp.loadstep1_disp, mainFEMdisp.loadstep2_disp, mainFEMdisp.loadstep3_disp, mainFEMdisp.loadstep4_disp, mainFEMdisp.loadstep5_disp])
 
-def matrixMultiplication (theta: float, loadstep: int, rownumber:int,femStrainDataSets:np.ndarray):
+def matrixMultiplication (theta: float, rownumber:int,femStrainDataSetForLoadsteps:np.ndarray): #include the loadstep specification in the femstraindatasetforloadstep
        '''
        notation taken from tutor's image of the required calculation
        '''
-       Qs = [[np.cos(theta), np.sin(theta), 0], [-np.sin(theta), np.cos(theta),0], [0,0,1]]
-       epsilons = [femStrainDataSets]
-       transformationMatrixs = np
+       
+       Qs = np.matrix([[np.cos(theta), np.sin(theta), 0], 
+              [-np.sin(theta), np.cos(theta),0], 
+              [0,0,1]])
+       epsilons = np.matrix([[femStrainDataSetForLoadsteps[rownumber,1], femStrainDataSetForLoadsteps[rownumber,4], femStrainDataSetForLoadsteps[rownumber,6]],
+              [femStrainDataSetForLoadsteps[rownumber,4], femStrainDataSetForLoadsteps[rownumber,2], femStrainDataSetForLoadsteps[rownumber,5]],
+              [femStrainDataSetForLoadsteps[rownumber,6], femStrainDataSetForLoadsteps[rownumber,5], femStrainDataSetForLoadsteps[rownumber,3]]
+              ])
+       transformationMatrixs = np.matmul(Qs, epsilons, Qs.T)
        return transformationMatrixs
+
+print (matrixMultiplication(np.pi/6,0,femStrainData1s[0]))
