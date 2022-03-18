@@ -12,13 +12,13 @@ exampleDatas = load_file("Data/FEM/shell_loadstep4_str.out")  # call function to
 exampleDatas = exampleDatas.to_numpy()  # convert into numpy arraw with 1 column
 
 def processFEMStrainData(datas: np.ndarray, loadStepNumber_i: int):  # convert into numpy array with several columns
-    for i in range(0, np.shape(datas)[0]-4):
+    for i in range(4, np.shape(datas)[0]):
         if i % 2 == 0:
-            strainData1s[loadStepNumber_i][int(i / 2)] = [datas[i, 0][3:8], datas[i, 0][9:21], datas[i, 0][21:33],
+            strainData1s[loadStepNumber_i][int(i/2-2)] = [datas[i, 0][3:8], datas[i, 0][9:21], datas[i, 0][21:33],
                                                           datas[i, 0][33:45], datas[i, 0][45:57], datas[i, 0][57:69],
                                                           datas[i, 0][69:81]]
         elif i % 2 == 1:
-            strainData2s[loadStepNumber_i][(int((i - 1) / 2))] = [datas[i, 0][3:8], datas[i, 0][9:21],
+            strainData2s[loadStepNumber_i][int((i-1)/2-2)] = [datas[i, 0][3:8], datas[i, 0][9:21],
                                                                   datas[i, 0][21:33], datas[i, 0][33:45],
                                                                   datas[i, 0][45:57], datas[i, 0][57:69],
                                                                   datas[i, 0][69:81]]
