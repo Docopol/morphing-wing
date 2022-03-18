@@ -1,29 +1,20 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
-# make data
-x1 = np.linspace(0, 10, 100)
-y1 = 4 + 2 * np.sin(2 * x1)
-y2 = 4 + 2 * np.cos(2 * x1)
-
-#grid
-x = np.linspace(0, 8, 1)
-y = np.linspace(0, 8, 1)
-
-# plot
-fig, ax = plt.subplots(1,2)
+import processFEMStrainData
+import mainFEMdisp
+'''
+femStrainData1s and femStrainData2s are numpy arrays with [loadstepnumber - 1] [nodenumber - 11651, data column (node number, x, y, z, xy, yz, zx)]
+e.g. strainData1s [2][:,2] -> gives the y strain data from data set 1 for the 3rd loadstep 
+- Ask Mick if confused
+'''
+femStrainData1s = processFEMStrainData.strainData1s
+femStrainData2s = processFEMStrainData.strainData2s
 
 
-ax[0].plot(x1, y1, linewidth=2.0, label = 'sin', color = 'orange')
-ax[0].plot(x1, y2, linewidth=2.0, label = 'cos',  color = 'blue' ) 
-ax[0].plot (x, y, linewidth = 1.0, color = 'grey')
+posNodes = np.array([mainFEMdisp.loadstep1_disp, mainFEMdisp.loadstep2_disp, mainFEMdisp.loadstep3_disp, mainFEMdisp.loadstep4_disp, mainFEMdisp.loadstep5_disp, mainFEMdisp.loadstep5_disp])
+#first 2 data points ommitted
 
-ax[0].set(xlim=(0, 8), xticks=np.arange(1, 8),
-       ylim=(0, 8), yticks=np.arange(1, 8))
-
-
-plt.legend(['sin','cos'])
+print(np.shape(posNodes[1]))
+print(np.shape (femStrainData1s))
 
 
-ax[1].plot(x1, y1, linewidth=2.0, label = 'sin', color = 'orange')
-plt.show()
