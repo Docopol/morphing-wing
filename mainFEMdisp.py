@@ -41,8 +41,8 @@ def nodeDistanceAndOrientation(data_file: np.ndarray):
         node_distance[data_file_row, 0] = np.sqrt(dx ** 2 + dy ** 2)
         node_orientation[data_file_row] = np.arctan(dy/dx)
 
-    return node_distance, node_orientation
 
+    return node_distance, node_orientation
 
 
 def nodeLocation(node_distances: np.ndarray) -> np.ndarray:
@@ -79,21 +79,17 @@ loadstep5_disp_loc = nodeLocation(loadstep5_disp_nodes)
 
 '''Below plots the leading edge shapes for 5 loadsteps'''
 
-# plt.scatter(loadstep1_disp[:, 1] + loadstep1_disp[:, 4], loadstep1_disp[:, 2] + loadstep1_disp[:, 5],
-#             label="Loadstep 1")
-# plt.scatter(loadstep2_disp[:, 1] + loadstep2_disp[:, 4], loadstep2_disp[:, 2] + loadstep2_disp[:, 5],
-#             label="Loadstep 2")
-# plt.scatter(loadstep3_disp[:, 1] + loadstep3_disp[:, 4], loadstep3_disp[:, 2] + loadstep3_disp[:, 5],
-#             label="Loadstep 3")
-# plt.scatter(loadstep4_disp[:, 1] + loadstep4_disp[:, 4], loadstep4_disp[:, 2] + loadstep4_disp[:, 5],
-#             label="Loadstep 4")
-# plt.scatter(loadstep5_disp[:, 1] + loadstep5_disp[:, 4], loadstep5_disp[:, 2] + loadstep5_disp[:, 5],
-#             label="Loadstep 5")
+plt.scatter(loadstep1_disp[:, 1] + loadstep1_disp[:, 4], loadstep1_disp[:, 2] + loadstep1_disp[:, 5],
+            label="Loadstep 1")
+plt.scatter(loadstep2_disp[:, 1] + loadstep2_disp[:, 4], loadstep2_disp[:, 2] + loadstep2_disp[:, 5],
+            label="Loadstep 2")
+plt.scatter(loadstep3_disp[:, 1] + loadstep3_disp[:, 4], loadstep3_disp[:, 2] + loadstep3_disp[:, 5],
+            label="Loadstep 3")
+plt.scatter(loadstep4_disp[:, 1] + loadstep4_disp[:, 4], loadstep4_disp[:, 2] + loadstep4_disp[:, 5],
+            label="Loadstep 4")
+plt.scatter(loadstep5_disp[:, 1] + loadstep5_disp[:, 4], loadstep5_disp[:, 2] + loadstep5_disp[:, 5],
+            label="Loadstep 5")
 #
 # plt.legend()
 # plt.show()
 
-
-# x_extreme = []
-# y_extreme = []
-# max_deflection_angle = atan(x_extreme/y_extreme)
