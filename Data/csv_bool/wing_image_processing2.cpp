@@ -172,6 +172,7 @@ void draw_bool(bool arr[4271][2848])
 
 std::string str_line( int line)
 {
+    //turns a row of bool values into a single line of csv file
     std::string l;
     for(int i = 0; i < w_tot; i++)
     {
@@ -183,6 +184,7 @@ std::string str_line( int line)
 
 void save_csv( std::string filename )
 {
+    //writes the boolean csv table line by line with lines from str_line
       std::ofstream myfile;
       myfile.open (filename);
       for( int a = 0; a < h_tot; a++ )
@@ -195,21 +197,57 @@ void save_csv( std::string filename )
       std::cout << "Data saved to .csv" << std::endl;
 }
 
-int main()
+void main_loop( char* import_name, std::string export_name )
 {
-    load_BMP( "G1a.bmp" );
+    //pretty much just a compressed form of the main contents
+    load_BMP( import_name );
 
     //run the actual cutoff
     bool_init_pass();
     for(int z = 0; z < 10; z++)
         bool_sec_pass();
 
-
     str_line(0);
-    save_csv("nie_wiem_1.csv");
+    save_csv( export_name );
 
     //draw_screen(rgb_img);
     //draw_bool(bool_img);
+}
+
+void batch_process( int no_of_files )
+{
+    std::string import_names[20];
+    std::string export_names[20];
+
+    std::string prefix = "G";
+    std::string format_1 = ".bmp";
+    std::string format_2 = ".csv";
+
+    //create 2 lists of exact filenames to read and write
+    //WARNING: no safety checks, if you f up, it may be dangerous, overwrite something, memory leak, etc
+    for( int i = 0; i < no_of_files; i++ )
+    {
+        import_names[i] = prefix + std::to_string(i+1) + format_1;
+        export_names[i] = prefix + std::to_string(i+1) + format_2;
+    }
+
+    //actually carry out the main loop for each file
+    for( int j = 0; j < no_of_files; j++ )
+    {
+        std::string str;
+        str = import_names[j];
+        char * writable = new char[str.size() + 1];
+        std::copy(str.begin(), str.end(), writable);
+        writable[str.size()] = '\0';
+
+        main_loop( writable, export_names[j] );
+    }
+}
+
+int main()
+{
+    //number of files to process
+    batch_process( 1 );
 
     return 0;
 }
