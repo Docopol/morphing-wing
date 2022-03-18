@@ -1,33 +1,5 @@
-import matplotlib.pyplot as plt
-import math
-#replace coordinates with read function of data from data output of another code
-#x_coordinates = [1.0, 0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.1, 0.075, 0.05, 0.025, 0.0125, 0.005, 0.0, 0.005, 0.0125, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0]
-#y_coordinates = [0.00095, 0.00605, 0.01086, 0.01967, 0.02748, 0.03423, 0.03971, 0.04352, 0.04501, 0.04456, 0.04303, 0.04009, 0.03512, 0.0315, 0.02666, 0.01961, 0.0142, 0.0089, 0.0, -0.0089, -0.0142, -0.01961, -0.02666, -0.0315, -0.03512, -0.04009, -0.04303, -0.04456, -0.04501, -0.04352, -0.03971, -0.03423, -0.02748, -0.01967, -0.01086, -0.00605, -0.00095]
-
-# = 5
-#x_circle = 5
-#y_circle = 5
-#import matplotlib.pyplot as plt
-#def circle_plotter(r, x_plotter, y_plotter):
- #   figure, axes = plt.subplots()
-  #  circle_1 = plt.Circle((5, 5), 5, fill = False)
-
-   # axes.set_aspect(1)
-    #axes.add_artist(circle_1)
-    #plt.xlim(0,1000)
-    #plt.ylim(0,100000)
-    #plt.show()
-import matplotlib.pyplot as plt
 import numpy as np
-x = np.linspace(0,1000)
-fx = []
-gx = []
-for i in range(len(x)):
-    fx.append(x[i]**3 + 3*x[i]**2 + 4*x[i] + 2*x +5) #any function
-    gx.append(x[i]*2)  # any function
 
-plt.plot(x,fx)
-plt.plot(x,gx)
-plt.show()
-
+import matplotlib.pyplot as plt
+for scipy import interpolate
 
