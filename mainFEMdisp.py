@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import math
+from math import atan
 
 def readFile(data_file: str):
     data_file = pd.read_csv(data_file, sep="\t")
@@ -73,7 +74,7 @@ loadstep5_disp_loc = nodeLocation(loadstep5_disp_nodes)
 # print(sum(loadstep2_disp_nodes))
 # print(sum(loadstep3_disp_nodes))
 # print(sum(loadstep4_disp_nodes))
-# print(sum(loadstep5_disp_nodes))
+#print(sum(loadstep5_disp_nodes))
 
 
 '''Below plots the leading edge shapes for 5 loadsteps'''
@@ -91,3 +92,8 @@ loadstep5_disp_loc = nodeLocation(loadstep5_disp_nodes)
 #
 # plt.legend()
 # plt.show()
+
+
+# x_extreme = []
+# y_extreme = []
+# max_deflection_angle = atan(x_extreme/y_extreme)

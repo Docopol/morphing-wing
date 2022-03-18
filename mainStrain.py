@@ -23,12 +23,13 @@ femNodeOrientation = np.array([mainFEMdisp.loadstep1_node_orientation, mainFEMdi
 
 
 # ____Plot the the orientations for each node___
-# plt.plot(loadstep1_disp_loc, loadstep1_node_orientation)
-# plt.plot(loadstep2_disp_loc, loadstep2_node_orientation)
-# plt.plot(loadstep3_disp_loc, loadstep3_node_orientation)
-# plt.plot(loadstep4_disp_loc, loadstep4_node_orientation)
-# plt.plot(loadstep5_disp_loc, loadstep5_node_orientation)
-# plt.show()
+plt.plot(femNodeLocation[1-1], femNodeOrientation[1-1], label = 'loadstep 1')
+plt.plot(femNodeLocation[2-1], femNodeOrientation[2-1], label = 'loadstep 2')
+plt.plot(femNodeLocation[3-1], femNodeOrientation[3-1], label = 'loadstep 3')
+plt.plot(femNodeLocation[4-1], femNodeOrientation[4-1], label = 'loadstep 4')
+plt.plot(femNodeLocation[5-1], femNodeOrientation[5-1], label = 'loadstep 5')
+plt.legend()
+plt.show()
 
 
 
