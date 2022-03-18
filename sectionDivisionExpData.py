@@ -1,5 +1,4 @@
-from contextlib import redirect_stderr
-from sqlite3 import Timestamp
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -54,17 +53,6 @@ Takes a list of fiber lengths, splits them into four sections A,B,C,D.
 Returns them as an array where each row is a section. A row 0, B row 1, C row 2, D row 3.
 '''
 
-def lengthSectionSplitter(fiberLengths):
-    sections = np.zeros((4,))
-    for i in range(len(fiberLengths)):
-        # Section C
-        if abs(fiberLengths[i] - 0.190102)<10**(-3):
-            startC = fiberLengths[i]
-        
-
-
-    return sections
-
 '''
 SectionX:
 
@@ -75,7 +63,7 @@ Note that all the segments have different sizes, must first be fitted before mat
 
 WARNING: Here the lengths are still uncalibrated, they need to be stretched/squeezed in order to fit the actual contour of the airfoil.
 WARNING: The strain data for Sections C and D are given backwards, as in, they start at the "end" of the contour and begin 
-'''# I know its redundant but fuck off.
+'''# I know its redundant but get off my back.
 
 #print(fiberLengths)
 def sectionC(timeStamp ,fiberLengths, strainMeasures):
@@ -143,21 +131,50 @@ def fitSection(sectionLengths, callibrationStart, callibrationEnd):
     return fittedLength
 
 
-AStrains, ALengths = sectionA(20, fiberLengths, experimental_strain)
-CStrains, CLengths = sectionC(20, fiberLengths, experimental_strain)
+def noiseRemove(timeZeroStrains, strainMeasures):
+
+    noNoiseStrains = np.zeros(len(timeZeroStrains))
+
+    for i in range(len(timeZeroStrains)):
+        noNoiseStrains[i] = float(strainMeasures[i]) - timeZeroStrains[i]
+
+    return noNoiseStrains
+
+# The number entered on each section function is the timestamp, starting from 1.
+
+zeroAStrains, trash= sectionA(1, fiberLengths, experimental_strain) # Gets time zero values for noise removal.
+AStrains, ALengths = sectionA(15, fiberLengths, experimental_strain)
+
+zeroCStrains, trash = sectionC(1, fiberLengths, experimental_strain)
+CStrains, CLengths = sectionC(15, fiberLengths, experimental_strain)
+
+AStrains = noiseRemove(zeroAStrains, AStrains)
+CStrains = noiseRemove(zeroCStrains, CStrains)
+
+AStrains = np.flip(AStrains)
 CStrains = [-x for x in CStrains]
 
-BStrains, BLengths = sectionB(20, fiberLengths, experimental_strain)
-DStrains, DLengths = sectionD(20, fiberLengths, experimental_strain)
+
+
+BStrains, BLengths = sectionB(1, fiberLengths, experimental_strain)
+DStrains, DLengths = sectionD(1, fiberLengths, experimental_strain)
+DStrains.reverse()
 DStrains = [-x for x in DStrains]
 
-CLengths = fitSection(CLengths, 0.07, 1.027)
+CLengths = fitSection(CLengths, 0.07, 1.027)#0.07; 1.027
 ALengths = fitSection(ALengths, 0.05, 1.05)
 
+BLengths = fitSection(BLengths, 0.05, 1.05)
+DLengths = fitSection(DLengths, 0.076, 1.024)
+
 ACSections = [ALengths, AStrains, CLengths, CStrains]
-BDSections = []
+BDSections = [BLengths, BStrains, DLengths, DStrains]
 
 #print(CStrain)
+
+
+
+
  
 plt.plot(ACSections[2], ACSections[3], linewidth=0.5) # Inside Graph
 plt.plot(ACSections[0], ACSections[1], linewidth=0.5, color='r') # Outside Graph
@@ -175,4 +192,5 @@ FiberLocation	ActualLocation
 0.984042	0.759
 1.25324		1.027
 '''
+
 #print(fiberLengths)
