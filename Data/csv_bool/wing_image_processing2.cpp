@@ -172,6 +172,7 @@ void draw_bool(bool arr[4271][2848])
 
 std::string str_line( int line)
 {
+    //turns a row of bool values into a single line of csv file
     std::string l;
     for(int i = 0; i < w_tot; i++)
     {
@@ -183,6 +184,7 @@ std::string str_line( int line)
 
 void save_csv( std::string filename )
 {
+    //writes the boolean csv table line by line with lines from str_line
       std::ofstream myfile;
       myfile.open (filename);
       for( int a = 0; a < h_tot; a++ )
@@ -197,6 +199,7 @@ void save_csv( std::string filename )
 
 void main_loop( char* import_name, std::string export_name )
 {
+    //pretty much just a compressed form of the main contents
     load_BMP( import_name );
 
     //run the actual cutoff
@@ -220,12 +223,15 @@ void batch_process( int no_of_files )
     std::string format_1 = ".bmp";
     std::string format_2 = ".csv";
 
+    //create 2 lists of exact filenames to read and write
+    //WARNING: no safety checks, if you f up, it may be dangerous, overwrite something, memory leak, etc
     for( int i = 0; i < no_of_files; i++ )
     {
         import_names[i] = prefix + std::to_string(i+1) + format_1;
         export_names[i] = prefix + std::to_string(i+1) + format_2;
     }
 
+    //actually carry out the main loop for each file
     for( int j = 0; j < no_of_files; j++ )
     {
         std::string str;
@@ -240,6 +246,7 @@ void batch_process( int no_of_files )
 
 int main()
 {
+    //number of files to process
     batch_process( 1 );
 
     return 0;
