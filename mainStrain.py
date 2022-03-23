@@ -39,6 +39,8 @@ v v make graphs v v
 #colorblindness
 for i in range (5):
     fig, ax = plt.subplots(2,2)
+    title = str('Loadstep' + str (i+1))
+    fig.suptitle (title)
     
     #inside comparison plots experiment vs fem
     ax[0,0].set_title('Inside Experimental vs FEM strains')
@@ -48,7 +50,7 @@ for i in range (5):
     
     ax[0,0].set_ylabel('Microstrain [μm/m]')
     ax[0,0].set_xlabel('Length along contour [m]')
-    plt.legend()
+    ax[0,0].legend()
 
 
 
@@ -56,30 +58,30 @@ for i in range (5):
     ax[0,1].set_title('Outside Experimental vs FEM strains')
     ax[0,1].plot(experimentDatas[timeStamps[i]][0][0], experimentDatas[timeStamps[i]][1][0], label = 'Experimental Loop A', color = 'lime', ls = '-.') 
     ax[0,1].plot(experimentDatas[timeStamps[i]][0][1], experimentDatas[timeStamps[i]][1][1], label = 'Experimental Loop B', color = 'darkred', ls = '--') 
-    ax[0,1].plot(femNodeLocations[i], processedFEMData1s [i][:,1]* 10 ** 6, label = 'FEM', color = 'hotpink')
+    ax[0,1].plot(np.flip(femNodeLocations[i]), processedFEMData1s [i][:,1]* 10 ** 6, label = 'FEM', color = 'hotpink')
     
     ax[0,1].set_ylabel('Microstrain [μm/m]')
     ax[0,1].set_xlabel('Length along contour [m]')
-    plt.legend()
+    ax[0,1].legend()
     
 
     #symmetry analysis experiment (bending analysis) A-C
     ax[1,0].set_title('Symmetry Analysis A-C')
     ax[1,0].plot (experimentDatas[timeStamps[i]][0][0], experimentDatas[timeStamps[i]][1][0],label = 'Outside', color = 'lime', ls = '-.')
-    ax[1,0].plot (experimentDatas[timeStamps[i]][0][2], [-x for x in experimentDatas[timeStamps[i]][1][2]], label = 'Inside', color = 'cyan', ls = '--')
+    ax[1,0].plot (experimentDatas[timeStamps[i]][0][2], [-x for x in experimentDatas[timeStamps[i]][1][2]], label = 'Inside', color = 'darkred', ls = '--')
 
     ax[1,0].set_ylabel('Difference in Microstrain between Inside and Outside [μm/m]')
     ax[1,0].set_xlabel('Length along contour [m]')
-    plt.legend()
+    ax[1,0].legend()
 
     #symmetry analysis experiment (bending analysis) #negative has to be taken
     ax[1,1].set_title('Symmetry Analysis B-D')
     ax[1,1].plot (experimentDatas[timeStamps[i]][0][1], experimentDatas[timeStamps[i]][1][1],label = 'Outside', color = 'lime', ls = '-.')
-    ax[1,1].plot (experimentDatas[timeStamps[i]][0][3], [-x for x in experimentDatas[timeStamps[i]][1][3]], label = 'Inside', color = 'cyan', ls = '--')
+    ax[1,1].plot (experimentDatas[timeStamps[i]][0][3], [-x for x in experimentDatas[timeStamps[i]][1][3]], label = 'Inside', color = 'darkred', ls = '--')
 
     ax[1,1].set_ylabel('Difference in Microstrain between Inside and Outside [μm/m]')
     ax[1,1].set_xlabel('Length along contour [m]')
-    plt.legend()
+    ax[1,1].legend()
 
 
 
