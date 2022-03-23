@@ -239,11 +239,6 @@ plt.plot(BLengths, BStrains, 'r--', linewidth=0.5) # Outside Graph
 plt.show()
 '''
 
-plt.plot(expStrains[0][2], expStrains[1][2],linewidth=0.5) # Inside Graph
-plt.plot(expStrains[0][0], expStrains[1][0], 'r--', linewidth=0.5) # Outside Graph
-plt.show()
-
-
 '''
 UNCOMMENT IF NEEDED
 
