@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import processFEMStrainData
 import mainFEMdisp
-import mainStrain
+
 '''
 femStrainData1s and femStrainData2s are numpy arrays with [loadstepnumber - 1] [nodenumber - 11651, data column (node number, x, y, z, xy, yz, zx)]
 e.g. strainData1s [2][:,2] -> gives the y strain data from data set 1 for the 3rd loadstep 
@@ -59,7 +59,3 @@ for i in range (np.shape (processedFEMData2s)[0]):
        for j in range (np.shape (processedFEMData2s)[1]): 
               processedFEMData2s [i][j][0] = femStrainData2s[i][j][0]
               processedFEMData2s [i][j][1]= float(matrixMultiplication(j,i,femStrainData2s[i])[0,0])
-
-plt.plot(mainStrain.femNodeLocation[2][:-1], -(processedFEMData2s[2][:,1]-processedFEMData2s[0][:,1])*10**6)
-plt.plot(mainStrain.femNodeLocation[2][:-1], (processedFEMData1s[2][:,1]-processedFEMData1s[0][:,1])*10**6)
-plt.show()
