@@ -221,10 +221,14 @@ def expData(timestamp):
     expStrains = [[ALengths, BLengths, CLengths, DLengths],[AStrains, BStrains, CStrains, DStrains]]
     return expStrains
 
+experimentalDatas = []
+
+for i in range(1,80):
+    experimentalDatas.append(expData(i))
+
 
 #print(np.size(DLengthsActual))
 #print(np.size(DStrains))
-
 
 
 '''
