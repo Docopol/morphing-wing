@@ -14,30 +14,6 @@ def load_file(file: str, skip_rows: int = None):
     return data_file
 
 
-# This stuff will go into the final code of this section.
-
-experimental_strain_rows = pd.DataFrame(load_file("Data/Experimental Strains/Measurements2014_05_22.csv")).to_numpy()
-rows, columns = experimental_strain_rows.shape
-experimental_strain = np.array(np.zeros((rows,4263)),dtype=str)
-
-
-
-for i in range(rows):
-    line = np.zeros((1,4263))
-    #print(line.shape)
-    line = np.array(experimental_strain_rows[i,0].split(sep=','))    
-    #print(line)
-    #print(line.shape)
-    experimental_strain[i] = line
-
-
-fiberLengths = [float(i) for i in experimental_strain[0,1:]] # This should not be changed
-
-'''
-# To access specific strains at timestamp change the X value in:
-# float(i) for i in experimental_strain[X,1:]
-strainMeasures = [float(i) for i in experimental_strain[20,1:]] # This will change based on which timestep is wanted
-''' # This shit should no longer be needed, just kept in case.
 
 
 '''
@@ -46,12 +22,6 @@ For the data calibration, the fiber length does not exactly match the path dista
 This means the data had to be squeezed in order to fit with the actual surface of the airfoil.
 '''
 
-'''
-lengthSectionSplitter:
-
-Takes a list of fiber lengths, splits them into four sections A,B,C,D.
-Returns them as an array where each row is a section. A row 0, B row 1, C row 2, D row 3.
-'''
 
 '''
 SectionX:
@@ -69,20 +39,21 @@ WARNING: The strain data for Sections C and D are given backwards, as in, they s
 def sectionC(timeStamp ,fiberLengths, strainMeasures):
     for i in range(len(fiberLengths)):
         if abs(fiberLengths[i] - 0.190102)<10**(-3):
-            firstTerm = i+1
+            firstTerm = i
         if fiberLengths[i] == 1.25324:
-            lastTerm = i+2 
+            lastTerm = i+1 
             break
     sectionCStrains = [float(a) for a in strainMeasures[timeStamp, firstTerm:lastTerm]]
     sectionCLengths = [float(a) for a in fiberLengths[firstTerm:lastTerm]]
+    sectionCLengths[0] = 0.190102
     return sectionCStrains, sectionCLengths
 
 def sectionA(timeStamp ,fiberLengths, strainMeasures):
     for i in range(len(fiberLengths)):
         if fiberLengths[i] == 1.58908:
-            firstTerm = i+1
+            firstTerm = i
         if fiberLengths[i] == 2.59791:
-            lastTerm = i+2 
+            lastTerm = i+1 
             break
     sectionAStrains = [float(a) for a in strainMeasures[timeStamp, firstTerm:lastTerm]]
     sectionALengths = [float(a) for a in fiberLengths[firstTerm:lastTerm]]
@@ -91,9 +62,9 @@ def sectionA(timeStamp ,fiberLengths, strainMeasures):
 def sectionB(timeStamp ,fiberLengths, strainMeasures):
     for i in range(len(fiberLengths)):
         if fiberLengths[i] == 2.75864:
-            firstTerm = i+1
+            firstTerm = i
         if fiberLengths[i] == 3.77008:
-            lastTerm = i+2 
+            lastTerm = i+1
             break
     sectionAStrains = [float(a) for a in strainMeasures[timeStamp, firstTerm:lastTerm]]
     sectionALengths = [float(a) for a in fiberLengths[firstTerm:lastTerm]]
@@ -102,9 +73,9 @@ def sectionB(timeStamp ,fiberLengths, strainMeasures):
 def sectionD(timeStamp ,fiberLengths, strainMeasures):
     for i in range(len(fiberLengths)):
         if fiberLengths[i] == 4.07065:
-            firstTerm = i+1
+            firstTerm = i
         if fiberLengths[i] == 5.17115:
-            lastTerm = i+2 
+            lastTerm = i+1 
             break
     sectionAStrains = [float(a) for a in strainMeasures[timeStamp, firstTerm:lastTerm]]
     sectionALengths = [float(a) for a in fiberLengths[firstTerm:lastTerm]]
@@ -140,29 +111,148 @@ def noiseRemove(timeZeroStrains, strainMeasures):
 
     return noNoiseStrains
 
+
+'''I hate what happens here but its needed.
+
+This function happens since the callibration points given make the gaps not have the same spacing.
+
+'''
+
+
+def calibrateSection(secLengths, secCalibFibers, secCalibActual):
+    a = 0
+    secLengthsActuals = np.zeros(1)
+
+    while a < len(secCalibActual)-1:
+        #print(secCalibActual[a])
+        for i in range(len(secLengths)):
+            #print(secCalibFibers[a], ' = ', secLengths[i])
+            if secCalibFibers[a] == secLengths[i]:
+                firstPt = i
+                continue
+            if secCalibFibers[a+1] == secLengths[i]:
+                lastPt = i 
+                continue
+        actualLengths = fitSection(secLengths[firstPt:lastPt],secCalibActual[a],secCalibActual[a+1])
+        np.delete(secLengthsActuals, -1)
+        secLengthsActuals = np.append(secLengthsActuals, actualLengths)
+        a=a+1
+    return secLengthsActuals
+
+
 # The number entered on each section function is the timestamp, starting from 1.
 
-zeroAStrains, trash= sectionA(1, fiberLengths, experimental_strain) # Gets time zero values for noise removal.
-AStrains, ALengths = sectionA(15, fiberLengths, experimental_strain)
 
-zeroCStrains, trash = sectionC(1, fiberLengths, experimental_strain)
-CStrains, CLengths = sectionC(15, fiberLengths, experimental_strain)
+def expData(timestamp):
 
-AStrains = noiseRemove(zeroAStrains, AStrains)
-CStrains = noiseRemove(zeroCStrains, CStrains)
+    experimental_strain_rows = pd.DataFrame(load_file("Data/Experimental Strains/Measurements2014_05_22.csv")).to_numpy()
+    rows, columns = experimental_strain_rows.shape
+    experimental_strain = np.array(np.zeros((rows,4263)),dtype=str)
 
-AStrains = np.flip(AStrains)
-CStrains = [-x for x in CStrains]
+    for i in range(rows):
+        line = np.zeros((1,4263))
+        #print(line.shape)
+        line = np.array(experimental_strain_rows[i,0].split(sep=','))    
+        #print(line)
+        #print(line.shape)
+        experimental_strain[i] = line
+
+
+    fiberLengths = [float(i) for i in experimental_strain[0,1:]] # This should not be changed
+
+    zeroAStrains, trash = sectionA(1, fiberLengths, experimental_strain) # Gets time zero values for noise removal.
+    AStrains, ALengths = sectionA(timestamp, fiberLengths, experimental_strain)
+
+    zeroCStrains, trash = sectionC(1, fiberLengths, experimental_strain)
+    CStrains, CLengths = sectionC(timestamp, fiberLengths, experimental_strain)
+
+    zeroBStrains, trash = sectionB(1, fiberLengths, experimental_strain)
+    BStrains, BLengths = sectionB(timestamp, fiberLengths, experimental_strain)
+
+    zeroDStrains, trash = sectionD(1, fiberLengths, experimental_strain)
+    DStrains, DLengths = sectionD(timestamp, fiberLengths, experimental_strain)
+
+    AStrains = noiseRemove(zeroAStrains, AStrains)
+    BStrains = noiseRemove(zeroBStrains, BStrains)
+    CStrains = noiseRemove(zeroCStrains, CStrains)
+    DStrains = noiseRemove(zeroDStrains, DStrains)
+
+    # C and D Strain will need to be inverted in order to be comparable in bending analysis.
+    AStrains = np.flip(AStrains)
+    #CStrains = [-x for x in CStrains]
+
+    BStrains = np.flip(BStrains)
+    #DStrains = [-x for x in DStrains]
+
+    ACalibrationActuals = [1.05, 0.55, 0.05]
+    ACalibrationFibers = [1.58908, 2.09349, 2.59791]
+
+    BCalibrationActuals = [0.05, 0.55, 1.05]
+    BCalibrationFibers = [2.75864, 3.26436, 3.77008]
+
+    CCalibrationActuals = [0.07, 0.296, 0.378, 0.54, 0.645, 0.70, 0.759, 1.027] 
+    CCalibrationFibers = [0.190102 ,0.414263, 0.510969, 0.673016, 0.793244, 0.848131, 0.984042, 1.25324]
+
+    DCalibrationActuals = [1.024, 0.764, 0.711, 0.650, 0.540, 0.388, 0.297, 0.076]
+    DCalibrationFibers = [4.07065, 4.33205, 4.50327, 4.55425, 4.68756, 4.83656, 4.95288, 5.17115]
+
+
+    CLengthsActual = calibrateSection(CLengths, CCalibrationFibers, CCalibrationActuals)
+    ALengthsActual = calibrateSection(ALengths, ACalibrationFibers, ACalibrationActuals)
+    ALengthsActual = np.flip(ALengthsActual)
+
+    ALengthsActual = np.delete(ALengthsActual,-1)
+    AStrains = np.delete(AStrains,-1)
+
+    CLengths = [float(x) for x in CLengthsActual]
+    ALengths = [float(x) for x in ALengthsActual]
+
+    BLengthsActual = calibrateSection(BLengths, BCalibrationFibers, BCalibrationActuals)
+    DLengthsActual = calibrateSection(DLengths, DCalibrationFibers, DCalibrationActuals)
+    BLengthsActual = np.flip(BLengthsActual)
+
+
+    DLengthsActual = np.delete(DLengthsActual, 0)
+    DStrains = np.delete(DStrains, 0)
+
+    BLengths = [float(x) for x in BLengthsActual]
+    DLengths = [float(x) for x in DLengthsActual]
+
+    expStrains = [[ALengths, BLengths, CLengths, DLengths],[AStrains, BStrains, CStrains, DStrains]]
+    return expStrains
+
+
+#print(np.size(DLengthsActual))
+#print(np.size(DStrains))
 
 
 
-BStrains, BLengths = sectionB(1, fiberLengths, experimental_strain)
-DStrains, DLengths = sectionD(1, fiberLengths, experimental_strain)
+'''
+plt.plot(CLengths, CStrains,linewidth=0.5) # Inside Graph
+plt.plot(ALengths, AStrains, 'r--', linewidth=0.5) # Outside Graph
+plt.show()
+'''
+
+'''
+plt.plot(DLengths, DStrains,linewidth=0.5) # Inside Graph
+plt.plot(BLengths, BStrains, 'r--', linewidth=0.5) # Outside Graph
+plt.show()
+'''
+
+plt.plot(expStrains[0][2], expStrains[1][2],linewidth=0.5) # Inside Graph
+plt.plot(expStrains[0][0], expStrains[1][0], 'r--', linewidth=0.5) # Outside Graph
+plt.show()
+
+
+'''
+UNCOMMENT IF NEEDED
+
+BStrains, BLengths = sectionB(28, fiberLengths, experimental_strain)
+DStrains, DLengths = sectionD(28, fiberLengths, experimental_strain)
 DStrains.reverse()
 DStrains = [-x for x in DStrains]
 
-CLengths = fitSection(CLengths, 0.07, 1.027)#0.07; 1.027
-ALengths = fitSection(ALengths, 0.05, 1.05)
+
 
 BLengths = fitSection(BLengths, 0.05, 1.05)
 DLengths = fitSection(DLengths, 0.076, 1.024)
@@ -170,27 +260,11 @@ DLengths = fitSection(DLengths, 0.076, 1.024)
 ACSections = [ALengths, AStrains, CLengths, CStrains]
 BDSections = [BLengths, BStrains, DLengths, DStrains]
 
-#print(CStrain)
 
+ '''
 
-
-
- 
-plt.plot(ACSections[2], ACSections[3], linewidth=0.5) # Inside Graph
-plt.plot(ACSections[0], ACSections[1], linewidth=0.5, color='r') # Outside Graph
-plt.show()
-
-
-'''
-FiberLocation	ActualLocation
-0.190102	0.07
-0.414263	0.296
-0.510969	0.378
-0.673016	0.54
-0.793244	0.645
-0.848131	0.70
-0.984042	0.759
-1.25324		1.027
-'''
+'''plt.plot(ACSections[2], ACSections[3],linewidth=0.5) # Inside Graph
+plt.plot(ACSections[0], ACSections[1], 'r--', linewidth=0.5) # Outside Graph
+plt.show()'''
 
 #print(fiberLengths)
