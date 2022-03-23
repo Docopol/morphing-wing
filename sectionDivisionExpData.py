@@ -146,7 +146,7 @@ def calibrateSection(secLengths, secCalibFibers, secCalibActual):
 def expData(timestamp):
 
     experimental_strain_rows = pd.DataFrame(load_file("Data/Experimental Strains/Measurements2014_05_22.csv")).to_numpy()
-    rows, columns = experimental_strain_rows.shape
+    rows = experimental_strain_rows.shape [0]
     experimental_strain = np.array(np.zeros((rows,4263)),dtype=str)
 
     for i in range(rows):
@@ -160,7 +160,7 @@ def expData(timestamp):
 
     fiberLengths = [float(i) for i in experimental_strain[0,1:]] # This should not be changed
 
-    zeroAStrains, trash = sectionA(1, fiberLengths, experimental_strain) # Gets time zero values for noise removal.
+    zeroAStrains = sectionA(1, fiberLengths, experimental_strain)[0] # Gets time zero values for noise removal.
     AStrains, ALengths = sectionA(timestamp, fiberLengths, experimental_strain)
 
     zeroCStrains, trash = sectionC(1, fiberLengths, experimental_strain)

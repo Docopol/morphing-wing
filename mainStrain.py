@@ -39,7 +39,7 @@ v v make graphs v v
 #colorblindness
 for i in range (5):
     fig, ax = plt.subplots(2,2)
-    title = str('Loadstep' + str (i+1))
+    title = str('Loadstep ' + str (i+1))
     fig.suptitle (title)
     
     #inside comparison plots experiment vs fem
