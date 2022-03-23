@@ -21,7 +21,7 @@ femNodeOrientation = np.array([mainFEMdisp.loadstep1_node_orientation, mainFEMdi
                                mainFEMdisp.loadstep3_node_orientation, mainFEMdisp.loadstep4_node_orientation,
                                mainFEMdisp.loadstep5_node_orientation])
 
-
+'''
 # ____Plot the the orientations for each node___
 plt.plot(femNodeLocation[1-1], femNodeOrientation[1-1], label = 'loadstep 1')
 plt.plot(femNodeLocation[2-1], femNodeOrientation[2-1], label = 'loadstep 2')
@@ -30,7 +30,7 @@ plt.plot(femNodeLocation[4-1], femNodeOrientation[4-1], label = 'loadstep 4')
 plt.plot(femNodeLocation[5-1], femNodeOrientation[5-1], label = 'loadstep 5')
 plt.legend()
 plt.show()
-
+'''
 
 
 def load_file(file: str, skip_rows: int = None):
@@ -70,7 +70,7 @@ v v make graphs v v
 #        ylim=(0, 8), yticks=np.arange(1, 8))
 #
 # ax[0,1].set_title('Bending Analyis FEM')
-
+'''
 # strain data 1
 plt.subplot(2, 2, 1)
 plt.plot(femNodeLocation[1 - 1], femStrainData1s[1 - 1][:, 4], label="loadstep 1.1")
@@ -116,3 +116,4 @@ plt.show()
 #              ylim=(0, 8), yticks=np.arange(1, 8))
 #
 # plt.show()
+'''

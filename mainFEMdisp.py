@@ -78,7 +78,7 @@ loadstep5_disp_loc = nodeLocation(loadstep5_disp_nodes)
 
 
 '''Below plots the leading edge shapes for 5 loadsteps'''
-
+'''
 plt.scatter(loadstep1_disp[:, 1] + loadstep1_disp[:, 4], loadstep1_disp[:, 2] + loadstep1_disp[:, 5],
             label="Loadstep 1")
 plt.scatter(loadstep2_disp[:, 1] + loadstep2_disp[:, 4], loadstep2_disp[:, 2] + loadstep2_disp[:, 5],
@@ -92,4 +92,4 @@ plt.scatter(loadstep5_disp[:, 1] + loadstep5_disp[:, 4], loadstep5_disp[:, 2] + 
 #
 # plt.legend()
 # plt.show()
-
+'''
