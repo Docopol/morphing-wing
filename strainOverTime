@@ -1,0 +1,12 @@
+import numpy as np
+from scipy.integrate import quad
+
+import sectionDivisionExpData
+
+expDatas = sectionDivisionExpData.experimentalDatas
+
+testData = expDatas[25][0][1][0:50]
+
+integral = quad(testData)
+
+print(integral)

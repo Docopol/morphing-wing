@@ -7,8 +7,5 @@ ___
 * 
 
 ___
-#### Experimental Strain Data 
-* Write final function of the section division and return single array.
-
 #### Symmetry over time
-* Write function that integrates total starin curve
+* Write function that integrates total strain curve
