@@ -3,6 +3,25 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import scipy.interpolate
 
+def f3(x):
+    y = (1.75 - 0.3) / (2500 - 0) * x + 0.3
+
+
+def f5(x):
+    y = (3.9 - 0.4) / (1800 - 0) * x + 0.4
+
+
+def f6(x):
+    y = (3.55 - 0.4) / (1500 - 0) * x + 0.4
+
+
+def f9(x):
+    y = (1.85 - 0.4) / (1200 - 0) * x + 0.4
+
+
+def f12(x):
+    y = (1.8 - 0.3) / (850 - 0) * x + 0.3
+
 
 def readFile(data_file: str):
     data_file = pd.read_csv(data_file, sep=",")
@@ -22,41 +41,25 @@ for index_dis in range(len(data_real[:])):
 
 # ____Calculate the current with the real power source voltages and the calibrationVoltageReadings3
 current_real = []
-# len_h = len(data_real[:])
-# len_i = len(data_real[1]["Voltage power source [V]"][:])
-# len_j = len(calibration_data[1]["Voltage power source [V]"][:])
-# print(len_h)
-# print(len_i)
-# print(len_j)
-# delta_list = [0.06, 0.05, 0.05, 0.05]
-# for h in range(len_h):
-#     current_x = np.zeros(len(data_real[h]["Voltage power source [V]"][:]))
-#     for i in range(len(data_real[h]["Voltage power source [V]"][:])):
-#         for j in range(len_j):
-#             vps_real = data_real[h]["Voltage power source [V]"][i]
-#             vps_cal = calibration_data[1]["Voltage power source [V]"][j]
-#             delta_vps = abs(vps_real - vps_cal)
-#
-#             if delta_vps < delta_list[h]:
-#                 current_x[i] = calibration_data[1]["Current power source [A]"][j]
-#
-#     current_real.append(current_x)
-
-
 
 current_real_interpolation = scipy.interpolate.interp1d(calibration_data[1]["Voltage power source [V]"][:],
-                                      calibration_data[1]["Current power source [A]"][:], fill_value='extrapolate')
-print(current_real_interpolation(0.0142))
-
-
+                                                        calibration_data[1]["Current power source [A]"][:],
+                                                        fill_value='extrapolate')
 for h in range(len(data_real[:])):
     current_x = np.zeros((len(data_real[h]["Voltage power source [V]"][:]), 2))
     for i in range(len(data_real[h]["Voltage power source [V]"][:])):
         current_x[i, 0] = data_real[h]["Time [s]"][i]
         current_x[i, 1] = current_real_interpolation(data_real[h]["Voltage power source [V]"][i])
-    current_real.append(current_x)      # current_real is a 4xix2 matrix
+    current_real.append(current_x)  # current_real is a 4xix2 matrix with time and current on the axis
 
 print(current_real)
+
+
+# ____Calculate the real force
+
+
+
+
 
 
 # ____put plots below____
