@@ -62,6 +62,7 @@ def genboolxy(array: np.ndarray) -> list:
     y = np.array(y)
     return [x, y]
 
+
 # Outdated function used for debugging
 def plotBoolpoints(array: np.ndarray, line: list = None) -> None:
 
