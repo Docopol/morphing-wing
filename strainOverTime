@@ -1,12 +1,35 @@
-import numpy as np
-from scipy.integrate import quad
+
+from scipy.integrate import trapezoid
+import matplotlib.pyplot as plt
+
 
 import sectionDivisionExpData
 
 expDatas = sectionDivisionExpData.experimentalDatas
 
-testData = expDatas[25][0][1][0:50]
+testData = expDatas[25][1][1]
 
-integral = quad(testData)
+integral = trapezoid(testData)
 
-print(integral)
+'''
+Provides a list of assymmetry values over the 80 different timeslots.
+- asyms
+'''
+
+asyms = []
+for time in range(79):
+        asymmetry = trapezoid(expDatas[time][1][1]) - trapezoid(expDatas[time][1][3])
+        #print(asymmetry)
+        asyms.append(asymmetry)
+
+times = range(79)
+
+
+'''
+plt.plot(times, asyms)
+plt.show()
+
+plt.plot(expDatas[56][0][1],expDatas[56][1][1], linewidth=0.5)
+plt.plot(expDatas[56][0][3],expDatas[56][1][3], linewidth=0.5, color='r', ls='--')
+plt.show()
+'''
