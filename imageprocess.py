@@ -139,11 +139,16 @@ def creategrid(array_bool: np.ndarray, subgrid_size: int = 12, usedict:bool = Fa
 
 
 @perftimer
-def regress(array: np.ndarray):
+def regress(array: np.ndarray, subgrid_size: int = 12):
 
-    def setupLS(array: np.ndarray) -> list:
+    def setupLS(array: np.ndarray, index: tuple = (0, 0), subgrid_size: int = 12) -> list:
 
         x, y = genBoolXY(array)
+
+        x += index[0]*subgrid_size
+        y += index[1]*subgrid_size
+
+        # plt.scatter(x, y)
 
         x_avg = np.mean(x)
         y_avg = np.mean(y)
@@ -153,10 +158,8 @@ def regress(array: np.ndarray):
 
         x = np.array(list(set(x)))
 
-        plt.plot(x, a * x + b)
-        plt.plot(x_avg, y_avg, 'ro')
-
-        print(a)
+        plt.plot(x, a * x + b, "black")
+        #plt.plot(x_avg, y_avg, 'ro')
 
         return [x, a, b, x_avg, y_avg]
 
@@ -166,17 +169,18 @@ def regress(array: np.ndarray):
     slope = np.zeros(size)
     centroid = np.zeros(size)
 
-    ok = 0
     for i in range(int(size[0])):
         for j in range(int(size[1])):
             loc_array = array[i,j]
             if np.count_nonzero(loc_array == True):
-                if ok == 5 or ok == 10:
-                    imageVisualization(loc_array)
-                    plotBoolpoints(rotate(loc_array, amount=-1), line=setupLS(rotate(loc_array, amount=-1)))
-                ok += 1
-                #setupLS(loc_array)
-    #plt.show()
+                # if ok == 5 or ok == 10:
+                    # imageVisualization(loc_array)
+                    # plotBoolpoints(rotate(loc_array, amount=-1), line=setupLS(rotate(loc_array, amount=-1), index=(i,j), subgrid_size= subgrid_size))
+                    # setupLS(rotate(loc_array, amount=-1), index=(i,j), subgrid_size= subgrid_size)
+                    # plt.show()
+
+                setupLS(rotate(loc_array, amount=0), index=(i, j), subgrid_size=subgrid_size)
+    plt.show()
 
 
 a = np.array([[False, False, False, False, False, False, False, False, False, False, False, False],
@@ -207,14 +211,16 @@ a = np.array([[False, False, False, False, False, False, False, False, False, Fa
 # imageVisualization(image[0])
 # imageVisualization(image[1])
 
+SG = 25
+
 img_bool_loc = files_in_directory("csv_bool", "csv")
 img_bool_file = load_file(img_bool_loc[2], separator=",", skip_last=True)
 # imageVisualization(img_bool_file)
 img_bool_cropped = cropimage(np.array(np.asarray(img_bool_file), dtype=bool), np.array(np.asarray(img_bool_file), dtype=bool))[1]
 imageVisualization(img_bool_cropped)
 #plotBool(rotate(img_bool_cropped,3))
-img_grid = creategrid(img_bool_cropped, subgrid_size = 50)
-regress(img_grid)
+img_grid = creategrid(img_bool_cropped, subgrid_size= SG)
+regress(img_grid, SG)
 
 
 # img_bool_file2 = load_file(img_bool_loc[0], separator=",", skip_last=True)
