@@ -149,7 +149,7 @@ def cropimage(array_color: np.ndarray, array_bool: np.ndarray) -> list:
 
 
 @perftimer
-def creategrid(array_bool: np.ndarray, usedict:bool = False) -> np.ndarray:
+def creategrid(array_bool: np.ndarray, usedict:bool = False):
     """
     :param array_bool: Cropped or non-cropped boolean array, to be devided into subgrids
     which are later to be used for linear/ or other global contour approximation.
