@@ -88,8 +88,6 @@ fem_force_interpolation = scipy.interpolate.interp1d(fem_force_csv["Displacement
 # fem_force = [fem_force_interpolation(actuator_disp[0]), fem_force_interpolation(actuator_disp[1]),
 #                           fem_force_interpolation(actuator_disp[2]), fem_force_interpolation(actuator_disp[3])]
 
-print(actuator_disp[0])
-print(fem_force_interpolation(0.071))
 
 # order data
 all_data = []
@@ -97,16 +95,15 @@ for index_dis_csv in range(len(data_real[:])):
 
     all_data_i = np.zeros((len(data_real[index_dis_csv]["Time [s]"][:]), 8))
     for index_total in range(len(data_real[index_dis_csv]["Time [s]"][:])):
-        all_data_i[index_total, 0] = data_real[index_dis_csv]["Time [s]"][index_total]
-        all_data_i[index_total, 1] = actuator_disp[index_dis_csv][index_total]*10
+        all_data_i[index_total, 0] = data_real[index_dis_csv]["Time [s]"][index_total]-data_real[index_dis_csv]["Time [s]"][0]
+        all_data_i[index_total, 1] = actuator_disp[index_dis_csv][index_total]
         all_data_i[index_total, 2] = f3(current_real[index_dis_csv][index_total, 1])
-        all_data_i[index_total, 3] = f5(current_real[index_dis_csv][index_total, 1])
-        all_data_i[index_total, 4] = f6(current_real[index_dis_csv][index_total, 1])
-        all_data_i[index_total, 5] = f9(current_real[index_dis_csv][index_total, 1])
-        all_data_i[index_total, 6] = f9(current_real[index_dis_csv][index_total, 1])
-        all_data_i[index_total, 7] = fem_force_interpolation(actuator_disp[index_dis_csv][index_total])
+        # all_data_i[index_total, 3] = f5(current_real[index_dis_csv][index_total, 1])
+        # all_data_i[index_total, 4] = f6(current_real[index_dis_csv][index_total, 1])
+        # all_data_i[index_total, 5] = f9(current_real[index_dis_csv][index_total, 1])
+        # all_data_i[index_total, 6] = f12(current_real[index_dis_csv][index_total, 1])
+        # all_data_i[index_total, 7] = fem_force_interpolation(actuator_disp[index_dis_csv][index_total])
     all_data.append(all_data_i)
-
 
 
 # ____put plots below____
@@ -117,13 +114,27 @@ for index_dis_csv in range(len(data_real[:])):
 # plt.show()
 
 
-for index1 in range(4):
+# for index1 in range(4):
+#
+#     for index2 in range(1):
+#         f = plt.figure()
+#         plt.scatter(fem_force_csv["Displacement [mm]"][:], fem_force_csv["Actuation force [N]"][:], label = "FEM")
+#         plt.plot(all_data[index1][:, 1], all_data[index1][:, index2+2], label = "Experimental")
+#         plt.xlabel("Displacement [mm]")
+#         plt.ylabel("Force [N]")
+#         plt.legend()
+#         plt.title("Dis"+str(index1+1) + "-" + "Pitch " + str(index2+1))
+#         # filename = "Data/DispAndForce/FEM_Experimental_forces/" + "Dis" +str(index1+1) + "-" + "Pitch " + str(index2+1)+ ".png"
+#         # f.savefig(filename, bbox_inches='tight')
+#         plt.show()
 
-    for index2 in range(5):
-        f = plt.figure()
-        plt.plot(all_data[index1][:, 0], all_data[index1][:, 7], label = "FEM")
-        plt.plot(all_data[index1][:, 0], all_data[index1][:, index2+2], label = "Experimental")
-        plt.legend()
-        plt.title("Dis"+str(index1+1) + "-" + "Pitch " + str(index2+1))
-        filename = "Data/DispAndForce/FEM-Experimental_forces/" + "Dis" +str(index1+1) + "-" + "Pitch " + str(index2+1)+ ".png"
-        f.savefig(filename, bbox_inches='tight')
+for index3 in range(4):
+    plt.plot(all_data[index3][:, 0], all_data[index3][:, 1], label = "Experimental")
+
+# plt.scatter()
+plt.show()
+
+for index4 in range(4):
+    plt.plot(all_data[index4][:, 0], all_data[index4][:, 2])
+
+plt.show()
