@@ -143,6 +143,19 @@ def calibrateSection(secLengths, secCalibFibers, secCalibActual):
 # The number entered on each section function is the timestamp, starting from 1.
 
 
+'''
+Returns a list of numpy arrays, each of which is a different timestamp of the fiber optic strain readings.
+
+Each list element is a different timestamp. (First coordinate)
+Each array is made up of two arrays, the lengths and strains. (Second Coordinate)
+Each strain or length arrays is made up of the four sections that the fiber can be divided into. (Third Coordinate)
+
+As an example, if you want to call the lengths of section C, at timestamp 24:
+
+experimentalDatas[23][0][2]
+
+'''
+
 def expData(timestamp):
 
     experimental_strain_rows = pd.DataFrame(load_file("Data/Experimental Strains/Measurements2014_05_22.csv")).to_numpy()
@@ -226,43 +239,3 @@ experimentalDatas = []
 for i in range(1,80):
     experimentalDatas.append(expData(i))
 
-#print(np.size(DLengthsActual))
-#print(np.size(DStrains))
-
-
-'''
-plt.plot(CLengths, CStrains,linewidth=0.5) # Inside Graph
-plt.plot(ALengths, AStrains, 'r--', linewidth=0.5) # Outside Graph
-plt.show()
-'''
-
-'''
-plt.plot(DLengths, DStrains,linewidth=0.5) # Inside Graph
-plt.plot(BLengths, BStrains, 'r--', linewidth=0.5) # Outside Graph
-plt.show()
-'''
-
-'''
-UNCOMMENT IF NEEDED
-
-BStrains, BLengths = sectionB(28, fiberLengths, experimental_strain)
-DStrains, DLengths = sectionD(28, fiberLengths, experimental_strain)
-DStrains.reverse()
-DStrains = [-x for x in DStrains]
-
-
-
-BLengths = fitSection(BLengths, 0.05, 1.05)
-DLengths = fitSection(DLengths, 0.076, 1.024)
-
-ACSections = [ALengths, AStrains, CLengths, CStrains]
-BDSections = [BLengths, BStrains, DLengths, DStrains]
-
-
- '''
-
-'''plt.plot(ACSections[2], ACSections[3],linewidth=0.5) # Inside Graph
-plt.plot(ACSections[0], ACSections[1], 'r--', linewidth=0.5) # Outside Graph
-plt.show()'''
-
-#print(fiberLengths)
