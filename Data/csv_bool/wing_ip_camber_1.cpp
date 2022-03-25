@@ -307,19 +307,103 @@ void scan_hor(int no_of_lines )
                     camber_points[i].p2 = j;
                 }
         }
-        //std::cout << i+1 << " " << camber_points[i].p1 << " " << camber_points[i].p2 << std::endl;
 
         //find span and midpoint
         if( camber_points[i].p1 != 0 && camber_points[i].p2 != 0 )
         {
             camber_points[i].span = camber_points[i].p2 - camber_points[i].p1;
-            camber_points[i].loc_hor = camber_points[i].p1 + camber_points[i].span;
+            camber_points[i].loc_hor = camber_points[i].p1 + camber_points[i].span/2;
 
             //test draw
             bool_img[ camber_points[i].loc_ver ][ camber_points[i].loc_hor ] = 1;
         }
+
+        std::cout << i+1 << " " << camber_points[i].p1 << " " << camber_points[i].p2 << " " << camber_points[i].loc_hor << std::endl;
     }
 }
+
+
+void scale_and_print_bool()
+{
+    bool bool_img2[500][500];
+    //shitty bootleg scaler
+    for( int i = 0; i < h_tot; i++ )
+        for( int j = 0; j < w_tot; j++ )
+        {
+            if( bool_img[i][j] == 1)
+                bool_img2[int(float(i)*(500.0/float(h_tot)))][int(float(j)*(500.0/float(w_tot)))] = 1;
+                //std::cout << int(float(i)*(500.0/float(h_tot))) << " " << int(float(j)*(500.0/float(w_tot))) << std::endl;
+        }
+
+    HDC hdc=GetDC(sHwnd);
+    for(int x = 0; x < 500; x++)
+        for(int y = 0; y < 500; y++)
+            SetPixel(hdc, x, y, RGB(bool_img2[x][y]*255,bool_img2[x][y]*255,bool_img2[x][y]*255));
+    ReleaseDC(sHwnd,hdc);
+
+}
+
+void find_gradients( int w )
+{
+    //this function finds approximate gradient at each camberline point
+    for( int i = 0; i < 499; i++ )
+    {
+        //check if there is even a camber point with such number
+        if( camber_points[i].loc_hor != 0 && camber_points[i+1].loc_hor != 0 )
+        {
+            if( (i == 0 || camber_points[i+1].loc_hor != 0) && camber_points[i].loc_hor != 0 && camber_points[i-1].loc_hor == 0 )
+            {
+                //find gradient if it is the first point after any discontinuity
+                int tmp1 = camber_points[i+1].loc_hor - camber_points[i].loc_hor;
+                int tmp2 = camber_points[i+1].loc_ver - camber_points[i].loc_ver;
+                camber_points[i].grad = float(tmp1)/float(tmp2);
+            }
+            if( (i == 499 || camber_points[i-1].loc_hor != 0) && camber_points[i].loc_hor != 0 && camber_points[i+1].loc_hor == 0 )
+            {
+                //find gradient if it is the last point before any discontinuity
+                int tmp1 = camber_points[i].loc_hor - camber_points[i-1].loc_hor;
+                int tmp2 = camber_points[i].loc_ver - camber_points[i-1].loc_ver;
+                camber_points[i].grad = float(tmp1)/float(tmp2);
+            }
+            if( i != 0 && i != 499 && camber_points[i-1].loc_hor != 0 && camber_points[i].loc_hor != 0 && camber_points[i+1].loc_hor != 0 )
+            {
+                //find gradient if it is the middle of normal and sane continous section
+                int tmp1 = camber_points[i+1].loc_hor - camber_points[i-1].loc_hor;
+                int tmp2 = camber_points[i+1].loc_ver - camber_points[i-1].loc_ver;
+                camber_points[i].grad = float(tmp1)/float(tmp2);
+            }
+        }
+        if( camber_points[i].loc_hor != 0 )
+        {
+            std::cout << i << " " << camber_points[i].grad << std::endl;
+            std::cout << camber_points[i-1].loc_hor << " " << camber_points[i].loc_hor << " " << camber_points[i+1].loc_hor << std::endl;
+            std::cout << camber_points[i-1].loc_ver << " " << camber_points[i].loc_ver << " " << camber_points[i+1].loc_ver << std::endl;
+            std::cout << std::endl;
+        }
+    }
+
+    //writes the boolean csv table line by line PLACEHOLDER DUMP OF CAMBER DATA
+      std::ofstream myfile;
+      std::string filename_camber = "placeholder_camber_dump.csv";
+      myfile.open ( filename_camber );
+      for( int a = 0; a < w; a++ )
+      {
+          std::string l;
+          //l.append(a, ", ", camber_points[a].loc_hor, ", ", camber_points[a].loc_ver, ", ", camber_points[a].grad );
+          l += std::to_string(a);
+          l += (", ");
+          l += std::to_string(camber_points[a].loc_hor);
+          l += (", ");
+          l += std::to_string(camber_points[a].loc_ver);
+          l += (", ");
+          l += std::to_string(camber_points[a].grad);
+
+          myfile << l;
+          myfile << " \n";
+      }
+      myfile.close();
+}
+
 
 
 int main()
@@ -327,10 +411,12 @@ int main()
     //number of files to process
     batch_process( 1 );
 
-    define_scanlines_vert( 50 );
-    scan_hor( 50 );
+    define_scanlines_vert( 100 );
+    scan_hor( 100 );
 
-    draw_bool(bool_img);
+    //draw_bool(bool_img);
+    find_gradients( 100 );
+    scale_and_print_bool();
 
     return 0;
 }
