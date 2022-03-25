@@ -184,12 +184,12 @@ def expData(timestamp):
 
     zeroDStrains, trash = sectionD(1, fiberLengths, experimental_strain)
     DStrains, DLengths = sectionD(timestamp, fiberLengths, experimental_strain)
-    
+    '''
     AStrains = noiseRemove(zeroAStrains, AStrains)
     BStrains = noiseRemove(zeroBStrains, BStrains)
     CStrains = noiseRemove(zeroCStrains, CStrains)
     DStrains = noiseRemove(zeroDStrains, DStrains)
-    
+    '''
     # C and D Strain will need to be inverted in order to be comparable in bending analysis.
     AStrains = np.flip(AStrains)
     #CStrains = [-x for x in CStrains]
