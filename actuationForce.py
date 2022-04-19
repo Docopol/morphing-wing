@@ -45,6 +45,7 @@ for index_dis in range(len(data_real[:])):
 
 current_real = []
 
+# interpolate so that you get a function Current Power source = f(Voltage Power Source)
 current_real_interpolation = scipy.interpolate.interp1d(calibration_data[1]["Voltage power source [V]"][:],
                                                         calibration_data[1]["Current power source [A]"][:],
                                                         fill_value='extrapolate')
@@ -74,39 +75,64 @@ for index_dis_csv in range(len(data_real[:])):
         # all_data_i[index_total, 6] = f12(current_real[index_dis_csv][index_total, 1])
     all_data.append(all_data_i)
 
-
-
 # find relation between current sensor voltage and current
 
-# interpolate so that power source voltage = f(current sensor voltage)
-interp_list_voltages_real = []
+
+# interpolate so that real power source voltage = f(current sensor voltage)
+
+psv_real_interp10 = scipy.interpolate.interp1d(all_data[0][:, 5], all_data[0][:, 4],
+                                               fill_value='extrapolate')
+psv_real_interp20 = scipy.interpolate.interp1d(all_data[1][:, 5], all_data[1][:, 4],
+                                               fill_value='extrapolate')
+psv_real_interp30 = scipy.interpolate.interp1d(all_data[2][:, 5], all_data[2][:, 4],
+                                               fill_value='extrapolate')
+psv_real_interp392 = scipy.interpolate.interp1d(all_data[3][:, 5], all_data[3][:, 4],
+                                                fill_value='extrapolate')
+
+# interpolate so that calibration voltage current sensor = f(Time) but now for SensorCalibration3
+vcs_vs_time_interp_cal = scipy.interpolate.interp1d(calibration_data[0]["Time [s]"][:],
+                                                    calibration_data[0]["Voltage current sensor [V]"][:],
+                                                    fill_value='extrapolate')
+
+# interpolate so that calibration voltage current sensor = f(Time) but now for SensorCalibration3
+psv_vs_time_interp_cal = scipy.interpolate.interp1d(calibration_data[0]["Time [s]"][:],
+                                                    calibration_data[0]["Voltage power source [V]"][:],
+                                                    fill_value='extrapolate')
+
+# interpolate so that calibration power source voltage = f(current sensor voltage) but now for SensorCalibration3
+psv_interp_cal = scipy.interpolate.interp1d(calibration_data[0]["Voltage current sensor [V]"][:],
+                                            calibration_data[0]["Voltage power source [V]"][:],
+                                            fill_value='extrapolate')
+
+
+# Get the values of the csc3 voltages for time of Disp files
+time_vs_current_disp = []
 for disp_index in range(4):
-    psv_real_interp = scipy.interpolate.interp1d(all_data[disp_index][:, 5], all_data[disp_index][:, 4],
-                                                 fill_value='extrapolate')
-    interp_list_voltages_real.append(psv_real_interp)
+    time_vs_current = np.zeros((len(data_real[disp_index]["Time [s]"]), 2))
+    for time_index in range(len(data_real[disp_index]["Time [s]"])):
+        time_vs_current[time_index, 0] = data_real[disp_index]["Time [s]"][time_index] - \
+                                            data_real[disp_index]["Time [s]"][0]  # time column
 
-# interpolate so that power source voltage = f(current sensor voltage) but now for SensorCalibration3
-interp_list_voltages_cal = []
-for disp_index in range(4):
-    psv_real_interp_cal = scipy.interpolate.interp1d(calibration_data[:, 2], calibration_data[:, 1],
-                                                 fill_value='extrapolate')
-    interp_list_voltages_cal.append(psv_real_interp_cal)
+        time_vs_current[time_index, 1] = current_real_interpolation(psv_interp_cal(data_real[disp_index]
+                                                                    ["Voltage current sensor [V]"][time_index])) # current column
 
+    time_vs_current_disp.append(time_vs_current)
 
-
+print(time_vs_current_disp)
 # print(max(all_data[2][:, 2]))
 # print(all_data[2][:, 1])
 
 # ____put plots below____
 
-# for index3 in range(4):
-#     plt.xlabel("Time [s]")
-#     plt.ylabel("Displacement [mm]")
-#     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
-#     plt.plot(all_data[index3][:, 0], all_data[index3][:, 1], label = label[index3])
-#     plt.legend()
-#
-# plt.show()
+# DELIVERABLE 1: displacement vs time plot FINISHED!!!!!!!!!!
+for index3 in range(4):
+    plt.xlabel("Time [s]")
+    plt.ylabel("Displacement [mm]")
+    label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
+    plt.plot(all_data[index3][:, 0], all_data[index3][:, 1], label = label[index3])
+    plt.legend()
+
+plt.show()
 
 
 # plt.xlabel("Time [s]")
@@ -117,7 +143,7 @@ for disp_index in range(4):
 
 # for index4 in range(4):
 #     plt.xlabel("Time [s]")
-#     plt.ylabel("Current [mm]")
+#     plt.ylabel("Current [A]")
 #     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
 #     plt.plot(all_data[index4][:, 0], all_data[index4][:, 3], label = label[index4])
 #     plt.legend()
@@ -125,21 +151,42 @@ for disp_index in range(4):
 # plt.show()
 
 
-# plt.xlabel("Time [s]")
-# plt.ylabel("Force [N]")
-
-# for index5 in range(4):
-#     plt.plot(all_data[index5][:, 0], all_data[index5][:, 2])
+# for index3 in range(4):
+#     plt.xlabel("Time [s]")
+#     plt.ylabel("Voltage current sensor [V]")
+#     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
+#     plt.plot(all_data[index3][:, 0], all_data[index3][:, 5], label=label[index3])
+#     plt.legend()
 #
-# plt.scatter([3.6, 6.0, 8.3, 10.4], calibration_data[2]["Actuation force [N]"][:], label="FEM data")
-# plt.legend()
+# plt.show()
+#
+# plt.xlabel("Time [s]")
+# plt.ylabel("Voltage current sensor [V]")
+# label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
+# plt.plot(calibration_data[0]["Time [s]"][:], calibration_data[0]["Voltage current sensor [V]"][:])
 # plt.show()
 
-for index3 in range(4):
-    plt.xlabel("Time [s]")
-    plt.ylabel("Voltage current sensor [V]")
-    label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
-    plt.plot(all_data[index3][:, 0], all_data[index3][:, 5], label=label[index3])
-    plt.legend()
+# for index3 in range(4):
+#     plt.xlabel("Time [s]")
+#     plt.ylabel("Voltage power source [V]")
+#     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
+#     plt.plot(time_vs_current_disp[index3][:, 0], time_vs_current_disp[index3][:, 1], label=label[index3])
+#     plt.legend()
+#
+# plt.show()
 
+
+# DELIVERABLE 2: force time plot FINISHED!!!!!!!!!!!!
+plt.xlabel("Time [s]")
+plt.ylabel("Force [N]")
+plt.scatter([3.6, 6.0, 8.3, 10.4], calibration_data[2]["Actuation force [N]"][:], label="FEM data")
+
+print(min(f3(time_vs_current_disp[3][:, 1])))
+
+for index3 in range(4):
+    label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
+    plt.plot(time_vs_current_disp[index3][:, 0], f3(time_vs_current_disp[index3][:, 1])-min(f3(time_vs_current_disp[3][:, 1])), label=label[index3])
+
+
+plt.legend()
 plt.show()
