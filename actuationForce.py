@@ -179,7 +179,7 @@ plt.show()
 # DELIVERABLE 2: force time plot FINISHED!!!!!!!!!!!!
 plt.xlabel("Time [s]")
 plt.ylabel("Force [N]")
-plt.scatter([3.6, 6.0, 8.3, 10.4], calibration_data[2]["Actuation force [N]"][:], label="FEM data")
+plt.scatter([2.915, 5.4, 7.75, 10], calibration_data[2]["Actuation force [N]"][:], label="FEM data")
 
 print(min(f3(time_vs_current_disp[3][:, 1])))
 
