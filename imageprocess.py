@@ -67,13 +67,14 @@ def addcamber(array: np.ndarray) -> list:
     x = np.array(x)
     y = np.array(y)
     plt.plot(x,y,"k")
+    plt.show()
     return [x,y]
 
 
 # Outdated function used for debugging
 def plotBoolpoints(array: np.ndarray, line: list = None) -> None:
 
-    points_x, points_y = genboolxy(array)
+    points_x, points_y = addcamber(array)
     plt.scatter(points_x, points_y)
     if line:
         x = line[0]
@@ -314,6 +315,7 @@ def regress(array: np.ndarray) -> np.ndarray:
     return centroid
 
 
+@perftimer
 class DeflectionProfiles:
     """
     Deflection angles realtive to the chord line, the class contains two different methodes for finding the angles.
@@ -380,24 +382,6 @@ class DeflectionProfiles:
         print(f"model1: {self.dangle2} degrees")
 
 
-# Test array
-a = np.array([[False, False, False, False, False, False, False, False, False, False, False, False],
-     [False, False, False, False, False, False, False, False, False, False, False, True],
-     [False, False, False, False, False, False, False, False, False, False, False, False],
-     [False, False, False, False, False, False, False, False, False, False, False, False],
-     [False, False, False, False, False, False, False, True, False, False, False, False],
-     [False, False, False, False, False, False, False, False, False, False, False, False],
-     [False, False, False, False, False, False, False, False, False, False, False, False],
-     [False, False, False, False, False, False, False, False, False, False, False, False],
-     [False, False, False, True, False, False, False, False, False, False, False, False],
-     [False, False, True, False, False, False, False, False, False, False, False, False],
-     [False, False, False, True, False, False, False, False, False, False, False, False],
-     [False, False, False, True, False, False, False, False, True, False, False, False],
-     [False, False, False, False, False, False, True, False, False, False, False, False],
-     [False, False, False, False, False, False, False, True, False, False, False, False],
-     [False, False, False, False, False, False, False, False, False, False, False, False]
-     ])
-
 # -----------------
 # Main calling code
 # -----------------
@@ -415,7 +399,8 @@ a = np.array([[False, False, False, False, False, False, False, False, False, Fa
 # imageVisualization(image[1])
 
 
-img_bool_loc = files_in_directory("csv_bool", "csv")
+### Obtain loadstep data
+img_bool_loc = files_in_directory("csv_bool/csv_final_maybe", "csv")
 img_bool_file1 = load_file(img_bool_loc[0], separator=",", skip_last=True)
 img_bool_file2 = load_file(img_bool_loc[1], separator=",", skip_last=True)
 
@@ -429,13 +414,27 @@ camber_ = addcamber(img_bool_cropped_camber)
 img_grid = creategrid(img_bool_cropped)
 centroid_ = regress(img_grid)
 
-df1 = DeflectionProfiles(camber_, centroid_)
-print(df1.__dict__)
+# df1 = DeflectionProfiles(camber_, centroid_)
+# print(df1.__dict__)
+
+
+### Obtain target data
+# img_bool_file_target1 = load_file(img_bool_loc[], separator=",", skip_last=True)
+# img_bool_file_target2 = load_file(img_bool_loc[], separator=",", skip_last=True)
+#
+# img_bool_cropped_camber_target, img_bool_cropped_target = cropimage(np.array(np.asarray(img_bool_file_target2), dtype=bool), np.array(np.asarray(img_bool_file_target1), dtype=bool))
+#
+# camber_target_ = addcamber(img_bool_cropped_camber_target)
+# img_grid_target = creategrid(img_bool_cropped_target)
+# centroid_target_ = regress(img_grid_target)
+
+# dft = DeflectionProfiles(camber_target_, centroid_target_)
+# print(dft.__dict__)
 
 # present results
 # plt.show()
 
-
+#deflection angle realtive to target (substract both data points)
 
 # img_bool_file2 = load_file(img_bool_loc[0], separator=",", skip_last=True)
 # img_bool_cropped2 = cropimage(np.array(np.asarray(img_bool_file2), dtype=bool), np.array(np.asarray(img_bool_file2), dtype=bool))[1]
