@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy
+import scipy.interpolate as scp
 import math
 
 from PIL import Image
+from scipy.misc import derivative
 
 from utils.other import perftimer
 from utils.filereader import files_in_directory
@@ -49,9 +50,14 @@ def loadRGBandBOOL(file: str, usepil: bool = False) -> list:
     file_bool = np.asarray(np.zeros((np.copy(image_colordata).shape[:2]), dtype=bool))
     return [np.asarray(image_colordata), file_bool]
 
-
-def addcamber(array: np.ndarray):
-
+@perftimer
+def addcamber(array: np.ndarray) -> list:
+    """
+    :param array: array containing boolean values based on the location of the camber line.
+    on locations where a camber line can be found the array item will have a value of 1, no camber is 0.
+    note: the size of the array(after cropping(same crop func as contour)) is equal to the cropped array representing the contour.
+    :return: x and y locations of camber points + addition of points to plot
+    """
     points = np.argwhere(array == 1)
     x = []
     y = []
@@ -60,7 +66,8 @@ def addcamber(array: np.ndarray):
         y.append(i[1])
     x = np.array(x)
     y = np.array(y)
-    plt.plot(x,y,"k.")
+    plt.plot(x,y,"k")
+    return [x,y]
 
 
 # Outdated function used for debugging
@@ -212,7 +219,8 @@ def regress(array: np.ndarray) -> np.ndarray:
     :param array: 4 dimensional array containing subgrids,
     using the subgrids the contour of the airfoil can be approximated using a linear approximation.
     linear approximation used: Least squares
-    :return: Pyplot containing the approximated airfoil contour
+    :return: Centroid locations of the least squares pieces [np.array([x-points]), np.array([x-points])].
+    Pyplot containing the approximated airfoil contour
     """
 
     # initialize global variable
@@ -307,10 +315,17 @@ def regress(array: np.ndarray) -> np.ndarray:
 
 
 class DeflectionProfiles:
+    """
+    """
 
     def __init__(self, camberline, centroid):
+        """
+        :param camberline: list containing the x and y locations of the camber line points.
+        [np.array([x-points]), np.array([y-points])]
+        :param centroid: list containing the x and y locations of the centroids of the least squares methode.
+        [np.array([x-points]), np.array([y-points])]
+        """
         self.camberline = camberline
-        self.centroid = centroid
         self.cX = centroid[0,:]
         self.cY = centroid[1,:]
         self.tipX = np.min(self.cX)
@@ -322,27 +337,43 @@ class DeflectionProfiles:
         self.rootmidpointX = np.abs(self.rootX2 + self.rootX1)/2
         self.rootmidpointY = np.abs(self.rootY2 + self.rootY1)/2
         self.dangle1 = 0
-        self.dangle1 = 1
-        self.dangle1 = 2
+        self.dangle2 = 0
         self.model1()
         self.model2()
-        self.model3()
 
     def model1(self):
         """
         :return: Deflection angle using rootmidpoint and tip point
         """
-        self.dangle1 = math.atan2(abs(self.rootmidpointY-self.tipY), abs(self.rootmidpointX-self.tipX))*180/math.pi
+        self.dangle1 = math.atan2(abs(self.rootmidpointY-self.tipY),
+                                  abs(self.rootmidpointX-self.tipX))*180/math.pi
 
     def model2(self):
-        pass
+        """
+        :return: Deflection angle using the tip and trailing point of the camber line
+        """
+        self.dangle2 = math.atan2(abs(self.camberline[1][-1] - self.camberline[1][0]),
+                                  abs(self.camberline[0][-1] - self.camberline[0][0])) * 180 / math.pi
 
+
+    # for local gradient, but shouldn't be to important
     def model3(self):
+        f = scp.interp1d(self.camberline[0], self.camberline[1], kind='linear')
+        print(f.__dict__)
+        # fprime = derivative(f, 1.0, dx=1e-6)
+        plt.plot(self.camberline[0], f(self.camberline[0]))
+        plt.show()
+
+    def model4(self):
         pass
 
     def printsummary(self):
+        """
+        :return:
+        """
         print("---------- Deflection angles - summary ----------")
-        print(f"model1: {self.dangle1}")
+        print(f"model1: {self.dangle1} degrees")
+        print(f"model1: {self.dangle2} degrees")
 
 
 # Test array
@@ -389,12 +420,12 @@ img_bool_cropped_camber, img_bool_cropped = cropimage(np.array(np.asarray(img_bo
 imageVisualization(img_bool_cropped)
 imageVisualization(img_bool_cropped_camber)
 
-print(addcamber(img_bool_cropped_camber))
+camber_ = addcamber(img_bool_cropped_camber)
 #plotBool(rotate(img_bool_cropped,3))
 img_grid = creategrid(img_bool_cropped)
 centroid_ = regress(img_grid)
 
-df1 = DeflectionProfiles(None, centroid_)
+df1 = DeflectionProfiles(camber_, centroid_)
 print(df1.__dict__)
 
 
