@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
+import math
 
 from PIL import Image
 
@@ -15,7 +16,7 @@ cut_left = 0
 cut_right = 0
 cut_up = 0
 cut_down = 0
-subgrid_size = 75
+subgrid_size = 25
 
 
 @perftimer
@@ -49,10 +50,9 @@ def loadRGBandBOOL(file: str, usepil: bool = False) -> list:
     return [np.asarray(image_colordata), file_bool]
 
 
-# Outdated function used for debugging
-def genboolxy(array: np.ndarray) -> list:
+def addcamber(array: np.ndarray):
 
-    points = np.argwhere(array == True)
+    points = np.argwhere(array == 1)
     x = []
     y = []
     for i in points:
@@ -60,7 +60,7 @@ def genboolxy(array: np.ndarray) -> list:
         y.append(i[1])
     x = np.array(x)
     y = np.array(y)
-    return [x, y]
+    plt.plot(x,y,"k.")
 
 
 # Outdated function used for debugging
@@ -89,7 +89,7 @@ def rotate(array: np.ndarray, amount: int = 1) -> np.ndarray:
 
 
 @perftimer
-def cropimage(array_color: np.ndarray, array_bool: np.ndarray) -> list:
+def cropimage(array_color: np.ndarray, array_bool: np.ndarray) -> tuple:
     """
     :param array_color: Color image array to be cropped
     :param array_bool: Boolean array to be cropped
@@ -145,7 +145,7 @@ def cropimage(array_color: np.ndarray, array_bool: np.ndarray) -> list:
     out_array_bool = array_bool[ankers[2]:ankers[0]-1, ankers[1]:ankers[3]+1]
 
     print(f"{np.shape(out_array_bool)=}")
-    return [out_array_color, out_array_bool]
+    return out_array_color, out_array_bool
 
 
 @perftimer
@@ -207,7 +207,7 @@ def creategrid(array_bool: np.ndarray, usedict:bool = False):
 
 
 @perftimer
-def regress(array: np.ndarray) -> None:
+def regress(array: np.ndarray) -> np.ndarray:
     """
     :param array: 4 dimensional array containing subgrids,
     using the subgrids the contour of the airfoil can be approximated using a linear approximation.
@@ -268,7 +268,7 @@ def regress(array: np.ndarray) -> None:
 
         plt.plot(x, a * x + b, "black")
 
-        ##  plt.plot(x_avg, y_avg, 'ro') # plot centroid points (DEBUG)
+        ## plt.plot(x_avg, y_avg, 'ro') # plot centroid points (DEBUG)
 
         return [x, a, b, x_avg, y_avg]
 
@@ -278,8 +278,8 @@ def regress(array: np.ndarray) -> None:
     # slope, centroid) for the ful global contour
     weight = np.zeros(size)
     slope = np.zeros(size)
-    centroidX = np.zeros(size)
-    centroidY = np.zeros(size)
+    centroidX = []
+    centroidY = []
 
     # perform least squares for every subgrid in main global array
     for i in range(int(size[0])):
@@ -298,11 +298,52 @@ def regress(array: np.ndarray) -> None:
                 # data of all the subgrids
                 weight[i, j] = np.count_nonzero(loc_array) / subgrid_size
                 slope[i, j] = res[1]
-                centroidX[i, j] = res[3]
-                centroidY[i, j] = res[4]
+                centroidX.append(res[3])
+                centroidY.append(res[4])
 
-    centroid = np.dstack((centroidX, centroidY))
+    centroid = np.vstack((centroidX, centroidY))
     plt.show()
+    return centroid
+
+
+class DeflectionProfiles:
+
+    def __init__(self, camberline, centroid):
+        self.camberline = camberline
+        self.centroid = centroid
+        self.cX = centroid[0,:]
+        self.cY = centroid[1,:]
+        self.tipX = np.min(self.cX)
+        self.tipY = float(self.cY[np.where(self.cX == self.tipX)])
+        self.rootY1 = np.min(self.cY)
+        self.rootY2 = np.max(self.cY)
+        self.rootX1 = float(self.cX[np.where(self.cY == self.rootY1)])
+        self.rootX2 = float(self.cX[np.where(self.cY == self.rootY2)])
+        self.rootmidpointX = np.abs(self.rootX2 + self.rootX1)/2
+        self.rootmidpointY = np.abs(self.rootY2 + self.rootY1)/2
+        self.dangle1 = 0
+        self.dangle1 = 1
+        self.dangle1 = 2
+        self.model1()
+        self.model2()
+        self.model3()
+
+    def model1(self):
+        """
+        :return: Deflection angle using rootmidpoint and tip point
+        """
+        self.dangle1 = math.atan2(abs(self.rootmidpointY-self.tipY), abs(self.rootmidpointX-self.tipX))*180/math.pi
+
+    def model2(self):
+        pass
+
+    def model3(self):
+        pass
+
+    def printsummary(self):
+        print("---------- Deflection angles - summary ----------")
+        print(f"model1: {self.dangle1}")
+
 
 # Test array
 a = np.array([[False, False, False, False, False, False, False, False, False, False, False, False],
@@ -340,13 +381,21 @@ a = np.array([[False, False, False, False, False, False, False, False, False, Fa
 
 
 img_bool_loc = files_in_directory("csv_bool", "csv")
-img_bool_file = load_file(img_bool_loc[2], separator=",", skip_last=True)
+img_bool_file1 = load_file(img_bool_loc[0], separator=",", skip_last=True)
+img_bool_file2 = load_file(img_bool_loc[1], separator=",", skip_last=True)
+
 # imageVisualization(img_bool_file)
-img_bool_cropped = cropimage(np.array(np.asarray(img_bool_file), dtype=bool), np.array(np.asarray(img_bool_file), dtype=bool))[1]
+img_bool_cropped_camber, img_bool_cropped = cropimage(np.array(np.asarray(img_bool_file2), dtype=bool), np.array(np.asarray(img_bool_file1), dtype=bool))
 imageVisualization(img_bool_cropped)
+imageVisualization(img_bool_cropped_camber)
+
+print(addcamber(img_bool_cropped_camber))
 #plotBool(rotate(img_bool_cropped,3))
 img_grid = creategrid(img_bool_cropped)
-regress(img_grid)
+centroid_ = regress(img_grid)
+
+df1 = DeflectionProfiles(None, centroid_)
+print(df1.__dict__)
 
 
 # img_bool_file2 = load_file(img_bool_loc[0], separator=",", skip_last=True)
@@ -365,7 +414,5 @@ regress(img_grid)
 # sometesting = load_file(img_bool_loc[3], separator=",", skip_last= False)
 # sometesting = np.asarray(sometesting)
 # for level in range(np.shape(sometesting)[0]):
-#
 #     plt.scatter(sometesting[:,2], sometesting[:,1])
 # plt.show()
-
