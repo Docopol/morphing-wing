@@ -199,6 +199,18 @@ std::string str_line( int line)
     return l;
 }
 
+std::string str_line_camber( int line)
+{
+    //turns a row of bool values into a single line of csv file
+    std::string l;
+    for(int i = 0; i < w_tot; i++)
+    {
+        l.append(1, camber_img[line][i] ? '1' : '0');
+        l.append(", ");
+    }
+    return l;
+}
+
 void save_csv( std::string filename )
 {
     //writes the boolean csv table line by line with lines from str_line
@@ -214,7 +226,22 @@ void save_csv( std::string filename )
       std::cout << "Data saved to .csv" << std::endl;
 }
 
-void main_loop( char* import_name, std::string export_name )
+void save_csv_camber( std::string filename )
+{
+    //writes the boolean csv table line by line with lines from str_line
+      std::ofstream myfile;
+      myfile.open (filename);
+      for( int a = 0; a < h_tot; a++ )
+      {
+          myfile << str_line_camber(a);
+          myfile << " \n";
+      }
+      myfile.close();
+
+      std::cout << "Data saved to .csv" << std::endl;
+}
+
+void main_loop( char* import_name, std::string export_name, std::string export_name2 )
 {
     //pretty much just a compressed form of the main contents
     if(std::filesystem::exists(import_name))
@@ -227,6 +254,7 @@ void main_loop( char* import_name, std::string export_name )
 
     str_line(0);
     save_csv( export_name );
+    save_csv_camber( export_name2 );
 
     //draw_screen(rgb_img);
     //draw_bool(bool_img);
@@ -236,8 +264,10 @@ void batch_process( int no_of_files )
 {
     std::string import_names[20];
     std::string export_names[20];
+    std::string export_names2[20];
 
     std::string prefix = "G";
+    std::string suffix = "camber";
     std::string format_1 = ".bmp";
     std::string format_2 = ".csv";
 
@@ -247,6 +277,7 @@ void batch_process( int no_of_files )
     {
         import_names[i] = prefix + std::to_string(i+1) + format_1;
         export_names[i] = prefix + std::to_string(i+1) + format_2;
+        export_names2[i] = prefix + std::to_string(i+1) + suffix + format_2;
     }
 
     //actually carry out the main loop for each file
@@ -258,7 +289,7 @@ void batch_process( int no_of_files )
         std::copy(str.begin(), str.end(), writable);
         writable[str.size()] = '\0';
 
-        main_loop( writable, export_names[j] );
+        main_loop( writable, export_names[j], export_names2[j] );
     }
 }
 
@@ -320,6 +351,8 @@ void scan_hor(int no_of_lines )
             //test draw
             camber_img[ camber_points[i].loc_ver ][ camber_points[i].loc_hor ] = 1;
         }
+        else
+            camber_img[ camber_points[i].loc_ver ][ camber_points[i].loc_hor ] = 0;
 
         std::cout << i+1 << " " << camber_points[i].p1 << " " << camber_points[i].p2 << " " << camber_points[i].loc_hor << std::endl;
     }
