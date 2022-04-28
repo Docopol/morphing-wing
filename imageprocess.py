@@ -316,6 +316,10 @@ def regress(array: np.ndarray) -> np.ndarray:
 
 class DeflectionProfiles:
     """
+    Deflection angles realtive to the chord line, the class contains two different methodes for finding the angles.
+    methode 1 relies on the tip and the midpoint of the contour root points.
+    methode 2 makes use of the camber line to identify the leading an trailing point
+    for both methodes the angle is obtained using the arctangent of delta y / delta x.
     """
 
     def __init__(self, camberline, centroid):
@@ -346,7 +350,7 @@ class DeflectionProfiles:
         :return: Deflection angle using rootmidpoint and tip point
         """
         self.dangle1 = math.atan2(abs(self.rootmidpointY-self.tipY),
-                                  abs(self.rootmidpointX-self.tipX))*180/math.pi
+                                  abs(self.rootmidpointX-self.tipX)) * 180 / math.pi
 
     def model2(self):
         """
@@ -369,7 +373,7 @@ class DeflectionProfiles:
 
     def printsummary(self):
         """
-        :return:
+        :return: summary of the deflection angles
         """
         print("---------- Deflection angles - summary ----------")
         print(f"model1: {self.dangle1} degrees")
@@ -427,6 +431,10 @@ centroid_ = regress(img_grid)
 
 df1 = DeflectionProfiles(camber_, centroid_)
 print(df1.__dict__)
+
+# present results
+# plt.show()
+
 
 
 # img_bool_file2 = load_file(img_bool_loc[0], separator=",", skip_last=True)
