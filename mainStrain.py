@@ -37,6 +37,7 @@ v v make graphs v v
 '''
 
 #colorblindness
+
 for i in range (5):
     fig, ax = plt.subplots(2,2)
     title = str('Loadstep ' + str (i+1))
@@ -46,7 +47,7 @@ for i in range (5):
     ax[0,0].set_title('Inside Experimental vs FEM strains')
     ax[0,0].plot(experimentDatas[timeStamps[i]][0][2], experimentDatas[timeStamps[i]][1][2], label = 'Experimental Loop C', color = 'lime', ls = '-.') 
     ax[0,0].plot(experimentDatas[timeStamps[i]][0][3], experimentDatas[timeStamps[i]][1][3], label = 'Experimental Loop D', color = 'darkred', ls = '--') 
-    ax[0,0].plot(np.flip(femNodeLocations[i]), processedFEMData2s [i][:,1] * 10 ** 6, label = 'FEM', color = 'hotpink')
+    ax[0,0].plot(np.flip(femNodeLocations[i]), (processedFEMData2s [i][:,1]-processedFEMData2s [0][:,1]) * 10 ** 6, label = 'FEM', color = 'hotpink') #"calibration" is the - part
     
     ax[0,0].set_ylabel('Microstrain [μm/m]')
     ax[0,0].set_xlabel('Length along contour [m]')
@@ -58,7 +59,7 @@ for i in range (5):
     ax[0,1].set_title('Outside Experimental vs FEM strains')
     ax[0,1].plot(experimentDatas[timeStamps[i]][0][0], experimentDatas[timeStamps[i]][1][0], label = 'Experimental Loop A', color = 'lime', ls = '-.') 
     ax[0,1].plot(experimentDatas[timeStamps[i]][0][1], experimentDatas[timeStamps[i]][1][1], label = 'Experimental Loop B', color = 'darkred', ls = '--') 
-    ax[0,1].plot(np.flip(femNodeLocations[i]), processedFEMData1s [i][:,1]* 10 ** 6, label = 'FEM', color = 'hotpink')
+    ax[0,1].plot(np.flip(femNodeLocations[i]), (processedFEMData1s [i][:,1]-processedFEMData1s [0][:,1])* 10 ** 6, label = 'FEM', color = 'hotpink')#"calibration" is the - part
     
     ax[0,1].set_ylabel('Microstrain [μm/m]')
     ax[0,1].set_xlabel('Length along contour [m]')
@@ -75,6 +76,7 @@ for i in range (5):
     ax[1,0].legend()
 
     #symmetry analysis experiment (bending analysis) #negative has to be taken
+    
     ax[1,1].set_title('Symmetry Analysis B-D')
     ax[1,1].plot (experimentDatas[timeStamps[i]][0][1], experimentDatas[timeStamps[i]][1][1],label = 'Outside', color = 'lime', ls = '-.')
     ax[1,1].plot (experimentDatas[timeStamps[i]][0][3], [-x for x in experimentDatas[timeStamps[i]][1][3]], label = 'Inside', color = 'darkred', ls = '--')
@@ -82,8 +84,17 @@ for i in range (5):
     ax[1,1].set_ylabel('Difference in Microstrain between Inside and Outside [μm/m]')
     ax[1,1].set_xlabel('Length along contour [m]')
     ax[1,1].legend()
+    
 
 
+'''
+plt.plot(np.flip(femNodeLocations[1]), processedFEMData2s [1][:,1] * 10 ** 6-processedFEMData2s [0][:,1] * 10 ** 6, label = '2')
+plt.plot(np.flip(femNodeLocations[2]), processedFEMData2s [2][:,1] * 10 ** 6-processedFEMData2s [0][:,1] * 10 ** 6, label = '3')
+plt.plot(np.flip(femNodeLocations[3]), processedFEMData2s [3][:,1] * 10 ** 6-processedFEMData2s [0][:,1] * 10 ** 6, label = '4')
+plt.plot(np.flip(femNodeLocations[4]), processedFEMData2s [4][:,1] * 10 ** 6-processedFEMData2s [0][:,1] * 10 ** 6, label = '5')
+plt.legend ()
+plt.show()
+'''
 
 #asymmetry over time
 #plt.plot (label = 'Loop A-C', color = 'lime', ls = '-.') )
@@ -95,6 +106,7 @@ plt.legend()
 
     
 plt.show()
+
 
 
 # ax[1, 1].set(xlim=(0, 8), xticks=np.arange(1, 8),
