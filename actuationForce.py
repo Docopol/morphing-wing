@@ -104,17 +104,17 @@ psv_interp_cal = scipy.interpolate.interp1d(calibration_data[0]["Voltage current
                                             calibration_data[0]["Voltage power source [V]"][:],
                                             fill_value='extrapolate')
 
-
 # Get the values of the csc3 voltages for time of Disp files
 time_vs_current_disp = []
 for disp_index in range(4):
     time_vs_current = np.zeros((len(data_real[disp_index]["Time [s]"]), 2))
     for time_index in range(len(data_real[disp_index]["Time [s]"])):
         time_vs_current[time_index, 0] = data_real[disp_index]["Time [s]"][time_index] - \
-                                            data_real[disp_index]["Time [s]"][0]  # time column
+                                         data_real[disp_index]["Time [s]"][0]  # time column
 
         time_vs_current[time_index, 1] = current_real_interpolation(psv_interp_cal(data_real[disp_index]
-                                                                    ["Voltage current sensor [V]"][time_index])) # current column
+                                                                                   ["Voltage current sensor [V]"][
+                                                                                       time_index]))  # current column
 
     time_vs_current_disp.append(time_vs_current)
 
@@ -125,15 +125,17 @@ print(time_vs_current_disp)
 # ____put plots below____
 
 # DELIVERABLE 1: displacement vs time plot FINISHED!!!!!!!!!!
+lineshape = ['dashed', 'dotted', 'dashdot', 'solid']
+colors_rgb = ['blue' , 'orange', 'red', 'green']
+markers = ['o', '+', 's', '*']
 for index3 in range(4):
     plt.xlabel("Time [s]")
     plt.ylabel("Displacement [mm]")
     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
-    plt.plot(all_data[index3][:, 0], all_data[index3][:, 1], label = label[index3])
+    plt.plot(all_data[index3][:, 0], all_data[index3][:, 1], linestyle=lineshape[index3], label=label[index3], color=colors_rgb[index3])
     plt.legend()
 
 plt.show()
-
 
 # plt.xlabel("Time [s]")
 # plt.ylabel("Voltage power source [V]")
@@ -185,8 +187,9 @@ print(min(f3(time_vs_current_disp[3][:, 1])))
 
 for index3 in range(4):
     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
-    plt.plot(time_vs_current_disp[index3][:, 0], f3(time_vs_current_disp[index3][:, 1])-min(f3(time_vs_current_disp[3][:, 1])), label=label[index3])
-
+    plt.plot(time_vs_current_disp[index3][:, 0],
+                f3(time_vs_current_disp[index3][:, 1]) - min(f3(time_vs_current_disp[3][:, 1])),
+                linestyle=lineshape[index3], label=label[index3], color=colors_rgb[index3])
 
 plt.legend()
 plt.show()
