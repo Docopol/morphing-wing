@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <cmath>
 #include <fstream>
+#include <filesystem>
 
 
 //global variables
@@ -24,11 +25,12 @@ struct px_color
 px_color rgb_img[4272][2848];
 //processed bool image storage
 bool bool_img[4272][2848];
+bool camber_img[4272][2848];
 //reference color for pixel seeking
 px_color ref_rgb = {230, 101, 43};
 //default tolerance and multiplier for them
 px_color ref_tolerance = {10, 10, 10};
-float multiplier = 2;
+float multiplier = 5;
 
 //storage for point locations and the associated gradients
 struct point_data
@@ -215,11 +217,12 @@ void save_csv( std::string filename )
 void main_loop( char* import_name, std::string export_name )
 {
     //pretty much just a compressed form of the main contents
-    load_BMP( import_name );
+    if(std::filesystem::exists(import_name))
+        load_BMP( import_name );
 
     //run the actual cutoff
     bool_init_pass();
-    for(int z = 0; z < 10; z++)
+    for(int z = 0; z < 250; z++)
         bool_sec_pass();
 
     str_line(0);
@@ -315,7 +318,7 @@ void scan_hor(int no_of_lines )
             camber_points[i].loc_hor = camber_points[i].p1 + camber_points[i].span/2;
 
             //test draw
-            bool_img[ camber_points[i].loc_ver ][ camber_points[i].loc_hor ] = 1;
+            camber_img[ camber_points[i].loc_ver ][ camber_points[i].loc_hor ] = 1;
         }
 
         std::cout << i+1 << " " << camber_points[i].p1 << " " << camber_points[i].p2 << " " << camber_points[i].loc_hor << std::endl;
@@ -411,11 +414,10 @@ int main()
     //number of files to process
     batch_process( 1 );
 
-    define_scanlines_vert( 100 );
-    scan_hor( 100 );
-
+    define_scanlines_vert( 300 );
+    scan_hor( 300 );
     //draw_bool(bool_img);
-    find_gradients( 100 );
+    find_gradients( 300 );
     scale_and_print_bool();
 
     return 0;
