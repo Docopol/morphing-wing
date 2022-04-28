@@ -37,6 +37,7 @@ v v make graphs v v
 '''
 
 #colorblindness
+'''
 
 for i in range (5):
     fig, ax = plt.subplots(2,2)
@@ -87,26 +88,35 @@ for i in range (5):
     
 
 
-'''
-plt.plot(np.flip(femNodeLocations[1]), processedFEMData2s [1][:,1] * 10 ** 6-processedFEMData2s [0][:,1] * 10 ** 6, label = '2')
-plt.plot(np.flip(femNodeLocations[2]), processedFEMData2s [2][:,1] * 10 ** 6-processedFEMData2s [0][:,1] * 10 ** 6, label = '3')
-plt.plot(np.flip(femNodeLocations[3]), processedFEMData2s [3][:,1] * 10 ** 6-processedFEMData2s [0][:,1] * 10 ** 6, label = '4')
-plt.plot(np.flip(femNodeLocations[4]), processedFEMData2s [4][:,1] * 10 ** 6-processedFEMData2s [0][:,1] * 10 ** 6, label = '5')
-plt.legend ()
-plt.show()
-'''
-
 #asymmetry over time
 #plt.plot (label = 'Loop A-C', color = 'lime', ls = '-.') )
 #plt.plot (label = 'Loop B-D', color = 'cyan', ls = '--') )
 
-ax[1,0].set_ylabel('Difference in Microstrain between Inside and Outside [μm/m]')
-ax[1,0].set_xlabel('Length along contour [m]')
 plt.legend()
-
     
 plt.show()
+'''
 
+
+#symmetry analysis experiment (bending analysis) A-C
+plt.plot (experimentDatas[timeStamps[2]][0][0], experimentDatas[timeStamps[2]][1][0],label = 'Outside', color = 'orange')
+plt.plot (experimentDatas[timeStamps[2]][0][2], [-x for x in experimentDatas[timeStamps[2]][1][2]], label = 'Inside', color = 'blue', ls = '--')
+
+plt.ylabel('Microstrain [μm/m]')
+plt.xlabel('Length along contour [m]')
+plt.legend()
+plt.savefig('figSymmetryAnalaysis1.png')
+
+#symmetry analysis experiment (bending analysis) #negative has to be taken
+
+plt.clf()
+plt.plot (experimentDatas[timeStamps[2]][0][1], experimentDatas[timeStamps[2]][1][1],label = 'Outside', color = 'orange')
+plt.plot (experimentDatas[timeStamps[2]][0][3], [-x for x in experimentDatas[timeStamps[2]][1][3]], label = 'Inside', color = 'blue', ls = '--')
+
+plt.ylabel('Microstrain [μm/m]')
+plt.xlabel('Length along contour [m]')
+plt.legend()
+plt.savefig('figSymmetryAnalaysis2.png')
 
 
 # ax[1, 1].set(xlim=(0, 8), xticks=np.arange(1, 8),
