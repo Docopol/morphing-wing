@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import scipy.interpolate as scp
 import math
 
@@ -18,7 +19,10 @@ cut_right = 0
 cut_up = 0
 cut_down = 0
 subgrid_size = 25
+translate = None
 
+# Styling variables
+colors = ["k", "b"]
 
 @perftimer
 def imageVisualization(file, show_colorbar:bool = False, name:str = "") -> None:
@@ -64,9 +68,12 @@ def addcamber(array: np.ndarray) -> list:
     for i in points:
         x.append(i[0])
         y.append(i[1])
-    x = np.array(x)
-    y = np.array(y)
-    plt.plot(x,y,"k")
+    x = np.array(x)[3:]
+    y = np.array(y)[3:]
+    f = scp.interp1d(x, y, kind='cubic')
+    #plt.plot(x, y, color=colors[0], linestyle='--', dashes=(5, 20), linewidth=1)
+    plt.plot(x, y, color=colors[0])
+    #plt.plot(x, f(x), color=colors[0])
     return [x,y]
 
 
@@ -82,7 +89,7 @@ def plotBoolpoints(array: np.ndarray, line: list = None) -> None:
         x_avg = line[3]
         y_avg = line[4]
         plt.plot(x, a*x + b)
-        plt.plot(x_avg, y_avg, 'ro')
+        plt.plot(x_avg, y_avg)
     plt.show()
 
 
@@ -265,9 +272,9 @@ def regress(array: np.ndarray) -> np.ndarray:
 
         x = np.array(list(set(x)))
 
-        plt.plot(x, a * x + b, "black")
+        ##plt.plot(x, a * x + b, "black")
 
-        ## plt.plot(x_avg, y_avg, 'ro') # plot centroid points (DEBUG)
+        #plt.plot(x_avg, y_avg, 'k.') # plot centroid points (DEBUG)
 
         return [x, a, b, x_avg, y_avg]
 
@@ -281,8 +288,8 @@ def regress(array: np.ndarray) -> np.ndarray:
     centroidY = []
 
     # perform least squares for every subgrid in main global array
-    for i in range(int(size[0])):
-        for j in range(int(size[1])):
+    for j in range(int(size[1])-1,-1,-1):
+        for i in range(int(size[0])-1,-1,-1):
             loc_array = array[i,j]
             if np.count_nonzero(loc_array == True):
                 ## some debugging code (DEBUG)
@@ -300,8 +307,39 @@ def regress(array: np.ndarray) -> np.ndarray:
                 centroidX.append(res[3])
                 centroidY.append(res[4])
 
+    centroidX = np.array(centroidX)
+    centroidY = np.array(centroidY)
+
+    xtiploc = int(np.where(centroidX == np.min(centroidX))[0])
+
+    lower_surfaceX = centroidX[xtiploc:]
+    upper_surfaceX = centroidX[0: xtiploc]
+
+    lower_surfaceY = centroidY[xtiploc:]
+    upper_surfaceY = centroidY[0: xtiploc]
+
+    bubble = True
+
+    while bubble:
+        bubble = False
+        for i in range(len(upper_surfaceX) - 1):
+            if upper_surfaceX[i + 1] > upper_surfaceX[i]:
+
+                temp_file = upper_surfaceX[i + 1]
+                upper_surfaceX[i + 1] = upper_surfaceX[i]
+                upper_surfaceX[i] = temp_file
+
+                temp_file_1 = upper_surfaceY[i + 1]
+                upper_surfaceY[i + 1] = upper_surfaceY[i]
+                upper_surfaceY[i] = temp_file_1
+
+                bubble = True
+
+    centroidX = np.concatenate([upper_surfaceX, lower_surfaceX])
+    centroidY = np.concatenate([upper_surfaceY, lower_surfaceY])
+
     centroid = np.vstack((centroidX, centroidY))
-    plt.show()
+    plt.plot(centroid[0], centroid[1])
     return centroid
 
 
@@ -336,6 +374,7 @@ class DeflectionProfiles:
         self.dangle2 = 0
         self.model1()
         self.model2()
+        self.printsummary()
 
     def model1(self):
         """
@@ -348,20 +387,8 @@ class DeflectionProfiles:
         """
         :return: Deflection angle using the tip and trailing point of the camber line
         """
-        self.dangle2 = math.atan2(abs(self.camberline[1][-1] - self.camberline[1][0]),
-                                  abs(self.camberline[0][-1] - self.camberline[0][0])) * 180 / math.pi
-
-
-    # for local gradient, but shouldn't be to important
-    def model3(self):
-        f = scp.interp1d(self.camberline[0], self.camberline[1], kind='linear')
-        print(f.__dict__)
-        # fprime = derivative(f, 1.0, dx=1e-6)
-        plt.plot(self.camberline[0], f(self.camberline[0]))
-        plt.show()
-
-    def model4(self):
-        pass
+        self.dangle2 = math.atan2(abs(self.camberline[1][-1] - self.camberline[1][3]),
+                                  abs(self.camberline[0][-1] - self.camberline[0][3])) * 180 / math.pi
 
     def printsummary(self):
         """
@@ -369,7 +396,7 @@ class DeflectionProfiles:
         """
         print("---------- Deflection angles - summary ----------")
         print(f"model1: {self.dangle1} degrees")
-        print(f"model1: {self.dangle2} degrees")
+        print(f"model2: {self.dangle2} degrees")
 
 
 # -----------------
@@ -381,32 +408,37 @@ img_bool_loc = files_in_directory("csv_bool/csv_final_maybe", "csv")
 img_bool_file1 = load_file(img_bool_loc[0], separator=",", skip_last=True)
 img_bool_file2 = load_file(img_bool_loc[1], separator=",", skip_last=True)
 
-# imageVisualization(img_bool_file)
 img_bool_cropped_camber, img_bool_cropped = cropimage(np.array(np.asarray(img_bool_file2), dtype=bool), np.array(np.asarray(img_bool_file1), dtype=bool))
-imageVisualization(img_bool_cropped)
-imageVisualization(img_bool_cropped_camber)
+# imageVisualization(img_bool_cropped)
+# imageVisualization(img_bool_cropped_camber)
 
 camber_ = addcamber(img_bool_cropped_camber)
 #plotBool(rotate(img_bool_cropped,3))
 img_grid = creategrid(img_bool_cropped)
 centroid_ = regress(img_grid)
 
-# df1 = DeflectionProfiles(camber_, centroid_)
+
+red_patch = mpatches.Patch(color='red', label='The red data')
+blue_patch = mpatches.Patch(color='blue', label='The blue data')
+plt.legend(handles=[red_patch, blue_patch])
+
+df1 = DeflectionProfiles(camber_, centroid_)
 # print(df1.__dict__)
 
-
 ### Obtain target data
-# img_bool_file_target1 = load_file(img_bool_loc[], separator=",", skip_last=True)
-# img_bool_file_target2 = load_file(img_bool_loc[], separator=",", skip_last=True)
-#
-# img_bool_cropped_camber_target, img_bool_cropped_target = cropimage(np.array(np.asarray(img_bool_file_target2), dtype=bool), np.array(np.asarray(img_bool_file_target1), dtype=bool))
-#
-# camber_target_ = addcamber(img_bool_cropped_camber_target)
-# img_grid_target = creategrid(img_bool_cropped_target)
-# centroid_target_ = regress(img_grid_target)
+img_bool_file_target1 = load_file(img_bool_loc[8], separator=",", skip_last=True)
+img_bool_file_target2 = load_file(img_bool_loc[9], separator=",", skip_last=True)
 
-# dft = DeflectionProfiles(camber_target_, centroid_target_)
+img_bool_cropped_camber_target, img_bool_cropped_target = cropimage(np.array(np.asarray(img_bool_file_target2), dtype=bool), np.array(np.asarray(img_bool_file_target1), dtype=bool))
+
+camber_target_ = addcamber(img_bool_cropped_camber_target)
+img_grid_target = creategrid(img_bool_cropped_target)
+centroid_target_ = regress(img_grid_target)
+
+dft = DeflectionProfiles(camber_target_, centroid_target_)
 # print(dft.__dict__)
+
+plt.show()
 
 # present results
 # plt.show()
