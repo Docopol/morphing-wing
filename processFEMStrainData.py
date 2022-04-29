@@ -25,7 +25,7 @@ def processFEMStrainData(datas: np.ndarray, loadStepNumber_i: int):  # convert i
     return
 
 '''
-strainData1s and strainData2s are numpy arraws with [loadstepnumber - 1] [nodenumber - 11651, data column (node number, x, y, z, xy, yz, zx)]
+strainData1s and strainData2s are numpy arrays with [loadstepnumber - 1] [nodenumber - 11651, data column (node number, x, y, z, xy, yz, zx)]
 e.g. strainData1s [2][:,2] -> gives the y strain data from data set 1 for the 3rd loadstep 
 '''
 
