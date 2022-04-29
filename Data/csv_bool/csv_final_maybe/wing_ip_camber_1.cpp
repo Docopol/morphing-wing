@@ -29,8 +29,8 @@ bool camber_img[4272][2848];
 //reference color for pixel seeking
 px_color ref_rgb = {230, 101, 43};
 //default tolerance and multiplier for them
-px_color ref_tolerance = {5, 5, 5};
-float multiplier = 15;
+px_color ref_tolerance = {15, 6, 6};
+float multiplier = 5;
 
 //storage for point locations and the associated gradients
 struct point_data
@@ -504,7 +504,7 @@ void batch_process( int no_of_files, int flag1 )
             }
         }
 
-        std::cout<< std::endl <<"Processing image No." << j << std::endl;
+        std::cout<< std::endl <<"Processing image No." << j+1 << std::endl;
 
         main_loop( writable, export_names[j], export_names2[j], j+1, flag1 );
     }
