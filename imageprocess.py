@@ -67,7 +67,6 @@ def addcamber(array: np.ndarray) -> list:
     x = np.array(x)
     y = np.array(y)
     plt.plot(x,y,"k")
-    plt.show()
     return [x,y]
 
 
@@ -134,25 +133,16 @@ def cropimage(array_color: np.ndarray, array_bool: np.ndarray) -> tuple:
     size = np.shape(array_bool)
     ankers = ankerpoint2()
 
-    print(size)
-    print(ankers)
-
     # save the amount that is going to be cropped on all sides
     cut_left = ankers[1] - 1
     cut_right = size[1] - ankers[3]
     cut_up = ankers[2]
     cut_down = size[0] - ankers[0]
 
-    print(f"{cut_left=}")
-    print(f"{cut_right=}")
-    print(f"{cut_up=}")
-    print(f"{cut_down=}")
-
     # crop both the color and boolean array
     out_array_color = array_color[ankers[2]:ankers[0]-1, ankers[1]:ankers[3]+1]
     out_array_bool = array_bool[ankers[2]:ankers[0]-1, ankers[1]:ankers[3]+1]
 
-    print(f"{np.shape(out_array_bool)=}")
     return out_array_color, out_array_bool
 
 
