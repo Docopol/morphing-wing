@@ -90,6 +90,8 @@ plt.plot(loadstep4_disp[:, 1] + loadstep4_disp[:, 4], loadstep4_disp[:, 2] + loa
 plt.plot(loadstep5_disp[:, 1] + loadstep5_disp[:, 4], loadstep5_disp[:, 2] + loadstep5_disp[:, 5],
             label="Loadstep 5")
 
+
 plt.legend()
 plt.show()
+
 
