@@ -376,19 +376,6 @@ class DeflectionProfiles:
 # Main calling code
 # -----------------
 
-# imageVisualization(a)
-# imageVisualization(cropimage(a, a)[1])
-# creategrid(np.array([[1,2],[2,3]]), np.array([[1,2],[2,3]]))
-# creategrid(a,a, subgrid_size=4)
-#
-#
-# images = files_in_directory("Images (BMP) - FOR IMAGE CALIBRATION ONLY", "bmp")
-# image = loadRGBandBOOL(images[-1])
-#
-# imageVisualization(image[0])
-# imageVisualization(image[1])
-
-
 ### Obtain loadstep data
 img_bool_loc = files_in_directory("csv_bool/csv_final_maybe", "csv")
 img_bool_file1 = load_file(img_bool_loc[0], separator=",", skip_last=True)
@@ -424,23 +411,4 @@ centroid_ = regress(img_grid)
 # present results
 # plt.show()
 
-#deflection angle realtive to target (substract both data points)
-
-# img_bool_file2 = load_file(img_bool_loc[0], separator=",", skip_last=True)
-# img_bool_cropped2 = cropimage(np.array(np.asarray(img_bool_file2), dtype=bool), np.array(np.asarray(img_bool_file2), dtype=bool))[1]
-#
-# imageVisualization(img_bool_cropped2)
-
-# imageVisualization(img_bool_cropped)
-# points = np.argwhere(img_bool_cropped == True)
-#
-# print(*zip(*points))
-# plt.scatter(*zip(*points))
-# plt.show()
-
-
-# sometesting = load_file(img_bool_loc[3], separator=",", skip_last= False)
-# sometesting = np.asarray(sometesting)
-# for level in range(np.shape(sometesting)[0]):
-#     plt.scatter(sometesting[:,2], sometesting[:,1])
-# plt.show()
+# deflection angle realtive to target (substract both data points)
