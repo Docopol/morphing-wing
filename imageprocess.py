@@ -466,7 +466,7 @@ print(f"---------- Deflection angles - final ----------\n"
       f"model1: {dft.dangle1 - df1.dangle1:.5f} degrees\n"
       f"model2: {dft.dangle2 - df1.dangle2:.5f} degrees")
 
-# ToDo
+# to do
 # add fem plots
 # styling of plots
 # choose to present camber or chord (for deflec)
