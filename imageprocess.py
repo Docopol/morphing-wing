@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy
+import scipy.interpolate as scp
+import math
 
 from PIL import Image
+from scipy.misc import derivative
 
 from utils.other import perftimer
 from utils.filereader import files_in_directory
@@ -15,7 +17,7 @@ cut_left = 0
 cut_right = 0
 cut_up = 0
 cut_down = 0
-subgrid_size = 75
+subgrid_size = 25
 
 
 @perftimer
@@ -48,11 +50,15 @@ def loadRGBandBOOL(file: str, usepil: bool = False) -> list:
     file_bool = np.asarray(np.zeros((np.copy(image_colordata).shape[:2]), dtype=bool))
     return [np.asarray(image_colordata), file_bool]
 
-
-# Outdated function used for debugging
-def genboolxy(array: np.ndarray) -> list:
-
-    points = np.argwhere(array == True)
+@perftimer
+def addcamber(array: np.ndarray) -> list:
+    """
+    :param array: array containing boolean values based on the location of the camber line.
+    on locations where a camber line can be found the array item will have a value of 1, no camber is 0.
+    note: the size of the array(after cropping(same crop func as contour)) is equal to the cropped array representing the contour.
+    :return: x and y locations of camber points + addition of points to plot
+    """
+    points = np.argwhere(array == 1)
     x = []
     y = []
     for i in points:
@@ -60,13 +66,14 @@ def genboolxy(array: np.ndarray) -> list:
         y.append(i[1])
     x = np.array(x)
     y = np.array(y)
-    return [x, y]
+    plt.plot(x,y,"k")
+    return [x,y]
 
 
 # Outdated function used for debugging
 def plotBoolpoints(array: np.ndarray, line: list = None) -> None:
 
-    points_x, points_y = genboolxy(array)
+    points_x, points_y = addcamber(array)
     plt.scatter(points_x, points_y)
     if line:
         x = line[0]
@@ -89,7 +96,7 @@ def rotate(array: np.ndarray, amount: int = 1) -> np.ndarray:
 
 
 @perftimer
-def cropimage(array_color: np.ndarray, array_bool: np.ndarray) -> list:
+def cropimage(array_color: np.ndarray, array_bool: np.ndarray) -> tuple:
     """
     :param array_color: Color image array to be cropped
     :param array_bool: Boolean array to be cropped
@@ -126,26 +133,17 @@ def cropimage(array_color: np.ndarray, array_bool: np.ndarray) -> list:
     size = np.shape(array_bool)
     ankers = ankerpoint2()
 
-    print(size)
-    print(ankers)
-
     # save the amount that is going to be cropped on all sides
     cut_left = ankers[1] - 1
     cut_right = size[1] - ankers[3]
     cut_up = ankers[2]
     cut_down = size[0] - ankers[0]
 
-    print(f"{cut_left=}")
-    print(f"{cut_right=}")
-    print(f"{cut_up=}")
-    print(f"{cut_down=}")
-
     # crop both the color and boolean array
     out_array_color = array_color[ankers[2]:ankers[0]-1, ankers[1]:ankers[3]+1]
     out_array_bool = array_bool[ankers[2]:ankers[0]-1, ankers[1]:ankers[3]+1]
 
-    print(f"{np.shape(out_array_bool)=}")
-    return [out_array_color, out_array_bool]
+    return out_array_color, out_array_bool
 
 
 @perftimer
@@ -207,12 +205,13 @@ def creategrid(array_bool: np.ndarray, usedict:bool = False):
 
 
 @perftimer
-def regress(array: np.ndarray) -> None:
+def regress(array: np.ndarray) -> np.ndarray:
     """
     :param array: 4 dimensional array containing subgrids,
     using the subgrids the contour of the airfoil can be approximated using a linear approximation.
     linear approximation used: Least squares
-    :return: Pyplot containing the approximated airfoil contour
+    :return: Centroid locations of the least squares pieces [np.array([x-points]), np.array([x-points])].
+    Pyplot containing the approximated airfoil contour
     """
 
     # initialize global variable
@@ -268,7 +267,7 @@ def regress(array: np.ndarray) -> None:
 
         plt.plot(x, a * x + b, "black")
 
-        ##  plt.plot(x_avg, y_avg, 'ro') # plot centroid points (DEBUG)
+        ## plt.plot(x_avg, y_avg, 'ro') # plot centroid points (DEBUG)
 
         return [x, a, b, x_avg, y_avg]
 
@@ -278,8 +277,8 @@ def regress(array: np.ndarray) -> None:
     # slope, centroid) for the ful global contour
     weight = np.zeros(size)
     slope = np.zeros(size)
-    centroidX = np.zeros(size)
-    centroidY = np.zeros(size)
+    centroidX = []
+    centroidY = []
 
     # perform least squares for every subgrid in main global array
     for i in range(int(size[0])):
@@ -298,74 +297,118 @@ def regress(array: np.ndarray) -> None:
                 # data of all the subgrids
                 weight[i, j] = np.count_nonzero(loc_array) / subgrid_size
                 slope[i, j] = res[1]
-                centroidX[i, j] = res[3]
-                centroidY[i, j] = res[4]
+                centroidX.append(res[3])
+                centroidY.append(res[4])
 
-    centroid = np.dstack((centroidX, centroidY))
+    centroid = np.vstack((centroidX, centroidY))
     plt.show()
+    return centroid
 
-# Test array
-a = np.array([[False, False, False, False, False, False, False, False, False, False, False, False],
-     [False, False, False, False, False, False, False, False, False, False, False, True],
-     [False, False, False, False, False, False, False, False, False, False, False, False],
-     [False, False, False, False, False, False, False, False, False, False, False, False],
-     [False, False, False, False, False, False, False, True, False, False, False, False],
-     [False, False, False, False, False, False, False, False, False, False, False, False],
-     [False, False, False, False, False, False, False, False, False, False, False, False],
-     [False, False, False, False, False, False, False, False, False, False, False, False],
-     [False, False, False, True, False, False, False, False, False, False, False, False],
-     [False, False, True, False, False, False, False, False, False, False, False, False],
-     [False, False, False, True, False, False, False, False, False, False, False, False],
-     [False, False, False, True, False, False, False, False, True, False, False, False],
-     [False, False, False, False, False, False, True, False, False, False, False, False],
-     [False, False, False, False, False, False, False, True, False, False, False, False],
-     [False, False, False, False, False, False, False, False, False, False, False, False]
-     ])
+
+@perftimer
+class DeflectionProfiles:
+    """
+    Deflection angles realtive to the chord line, the class contains two different methodes for finding the angles.
+    methode 1 relies on the tip and the midpoint of the contour root points.
+    methode 2 makes use of the camber line to identify the leading an trailing point
+    for both methodes the angle is obtained using the arctangent of delta y / delta x.
+    """
+
+    def __init__(self, camberline, centroid):
+        """
+        :param camberline: list containing the x and y locations of the camber line points.
+        [np.array([x-points]), np.array([y-points])]
+        :param centroid: list containing the x and y locations of the centroids of the least squares methode.
+        [np.array([x-points]), np.array([y-points])]
+        """
+        self.camberline = camberline
+        self.cX = centroid[0,:]
+        self.cY = centroid[1,:]
+        self.tipX = np.min(self.cX)
+        self.tipY = float(self.cY[np.where(self.cX == self.tipX)])
+        self.rootY1 = np.min(self.cY)
+        self.rootY2 = np.max(self.cY)
+        self.rootX1 = float(self.cX[np.where(self.cY == self.rootY1)])
+        self.rootX2 = float(self.cX[np.where(self.cY == self.rootY2)])
+        self.rootmidpointX = np.abs(self.rootX2 + self.rootX1)/2
+        self.rootmidpointY = np.abs(self.rootY2 + self.rootY1)/2
+        self.dangle1 = 0
+        self.dangle2 = 0
+        self.model1()
+        self.model2()
+
+    def model1(self):
+        """
+        :return: Deflection angle using rootmidpoint and tip point
+        """
+        self.dangle1 = math.atan2(abs(self.rootmidpointY-self.tipY),
+                                  abs(self.rootmidpointX-self.tipX)) * 180 / math.pi
+
+    def model2(self):
+        """
+        :return: Deflection angle using the tip and trailing point of the camber line
+        """
+        self.dangle2 = math.atan2(abs(self.camberline[1][-1] - self.camberline[1][0]),
+                                  abs(self.camberline[0][-1] - self.camberline[0][0])) * 180 / math.pi
+
+
+    # for local gradient, but shouldn't be to important
+    def model3(self):
+        f = scp.interp1d(self.camberline[0], self.camberline[1], kind='linear')
+        print(f.__dict__)
+        # fprime = derivative(f, 1.0, dx=1e-6)
+        plt.plot(self.camberline[0], f(self.camberline[0]))
+        plt.show()
+
+    def model4(self):
+        pass
+
+    def printsummary(self):
+        """
+        :return: summary of the deflection angles
+        """
+        print("---------- Deflection angles - summary ----------")
+        print(f"model1: {self.dangle1} degrees")
+        print(f"model1: {self.dangle2} degrees")
+
 
 # -----------------
 # Main calling code
 # -----------------
 
-# imageVisualization(a)
-# imageVisualization(cropimage(a, a)[1])
-# creategrid(np.array([[1,2],[2,3]]), np.array([[1,2],[2,3]]))
-# creategrid(a,a, subgrid_size=4)
-#
-#
-# images = files_in_directory("Images (BMP) - FOR IMAGE CALIBRATION ONLY", "bmp")
-# image = loadRGBandBOOL(images[-1])
-#
-# imageVisualization(image[0])
-# imageVisualization(image[1])
+### Obtain loadstep data
+img_bool_loc = files_in_directory("csv_bool/csv_final_maybe", "csv")
+img_bool_file1 = load_file(img_bool_loc[0], separator=",", skip_last=True)
+img_bool_file2 = load_file(img_bool_loc[1], separator=",", skip_last=True)
 
-
-img_bool_loc = files_in_directory("csv_bool", "csv")
-img_bool_file = load_file(img_bool_loc[2], separator=",", skip_last=True)
 # imageVisualization(img_bool_file)
-img_bool_cropped = cropimage(np.array(np.asarray(img_bool_file), dtype=bool), np.array(np.asarray(img_bool_file), dtype=bool))[1]
+img_bool_cropped_camber, img_bool_cropped = cropimage(np.array(np.asarray(img_bool_file2), dtype=bool), np.array(np.asarray(img_bool_file1), dtype=bool))
 imageVisualization(img_bool_cropped)
+imageVisualization(img_bool_cropped_camber)
+
+camber_ = addcamber(img_bool_cropped_camber)
 #plotBool(rotate(img_bool_cropped,3))
 img_grid = creategrid(img_bool_cropped)
-regress(img_grid)
+centroid_ = regress(img_grid)
+
+# df1 = DeflectionProfiles(camber_, centroid_)
+# print(df1.__dict__)
 
 
-# img_bool_file2 = load_file(img_bool_loc[0], separator=",", skip_last=True)
-# img_bool_cropped2 = cropimage(np.array(np.asarray(img_bool_file2), dtype=bool), np.array(np.asarray(img_bool_file2), dtype=bool))[1]
+### Obtain target data
+# img_bool_file_target1 = load_file(img_bool_loc[], separator=",", skip_last=True)
+# img_bool_file_target2 = load_file(img_bool_loc[], separator=",", skip_last=True)
 #
-# imageVisualization(img_bool_cropped2)
-
-# imageVisualization(img_bool_cropped)
-# points = np.argwhere(img_bool_cropped == True)
+# img_bool_cropped_camber_target, img_bool_cropped_target = cropimage(np.array(np.asarray(img_bool_file_target2), dtype=bool), np.array(np.asarray(img_bool_file_target1), dtype=bool))
 #
-# print(*zip(*points))
-# plt.scatter(*zip(*points))
+# camber_target_ = addcamber(img_bool_cropped_camber_target)
+# img_grid_target = creategrid(img_bool_cropped_target)
+# centroid_target_ = regress(img_grid_target)
+
+# dft = DeflectionProfiles(camber_target_, centroid_target_)
+# print(dft.__dict__)
+
+# present results
 # plt.show()
 
-
-# sometesting = load_file(img_bool_loc[3], separator=",", skip_last= False)
-# sometesting = np.asarray(sometesting)
-# for level in range(np.shape(sometesting)[0]):
-#
-#     plt.scatter(sometesting[:,2], sometesting[:,1])
-# plt.show()
-
+# deflection angle realtive to target (substract both data points)
