@@ -71,11 +71,14 @@ def addcamber(array: np.ndarray, translateState:bool = False) -> list:
     for i in points:
         x.append(i[0])
         y.append(i[1])
-    x = np.array(x)[:-1]
-    y = np.array(y)[:-1]
+    x = np.array(x)[3:]
+    y = np.array(y)[3:]
     if translateState:
-        translate = y[0] - midpoint[1]
-        y = y - translate
+        print(midpoint[0], midpoint[1])
+        print(x[-1], y[-1])
+        translate = (midpoint[0] - x[-1], midpoint[1] - y[-1])
+        x = x + translate[0]
+        y = y + translate[1]
     f = scp.interp1d(x, y, kind='cubic')
     #plt.plot(x, y, color=colors[0], linestyle='--', dashes=(5, 20), linewidth=1)
     plt.plot(x, y, color=colors[0])
@@ -297,7 +300,7 @@ def regress(array: np.ndarray, translateState:bool = False) -> np.ndarray:
     # perform least squares for every subgrid in main global array
     # scanner which starts at the bottom left, and goes to the right (layer per layer)
     for j in range(int(size[1])-1,-1,-1):
-        for i in range(int(size[0])):
+        for i in range(int(size[0])-1,-1,-1):
             loc_array = array[i,j]
             if np.count_nonzero(loc_array == True):
                 ## some debugging code (DEBUG)
@@ -315,28 +318,23 @@ def regress(array: np.ndarray, translateState:bool = False) -> np.ndarray:
                 centroidX.append(res[3])
                 centroidY.append(res[4])
 
-    # convert centroid list to arrays
     centroidX = np.array(centroidX)
     centroidY = np.array(centroidY)
 
-    # find contour tip x location
-    xtiploc = int(np.where(centroidX == np.max(centroidX))[0])
+    xtiploc = int(np.where(centroidX == np.min(centroidX))[0])
 
-    # Split contour into x and y and top and bottom
     lower_surfaceX = centroidX[0: xtiploc]
     upper_surfaceX = centroidX[xtiploc:]
 
     lower_surfaceY = centroidY[0: xtiploc]
     upper_surfaceY = centroidY[xtiploc:]
 
-    # sort the contour centroid values for correct plotting
     bubble = True
 
     while bubble:
         bubble = False
         for i in range(len(upper_surfaceX) - 1):
-            if upper_surfaceX[i + 1] > upper_surfaceX[i]:
-
+            if upper_surfaceX[i + 1] < upper_surfaceX[i]:
                 temp_file = upper_surfaceX[i + 1]
                 upper_surfaceX[i + 1] = upper_surfaceX[i]
                 upper_surfaceX[i] = temp_file
@@ -347,11 +345,28 @@ def regress(array: np.ndarray, translateState:bool = False) -> np.ndarray:
 
                 bubble = True
 
+    bubble = True
+
+    while bubble:
+        bubble = False
+        for i in range(len(lower_surfaceX) - 1):
+            if lower_surfaceX[i + 1] > lower_surfaceX[i]:
+                temp_file = lower_surfaceX[i + 1]
+                lower_surfaceX[i + 1] = lower_surfaceX[i]
+                lower_surfaceX[i] = temp_file
+
+                temp_file_1 = lower_surfaceY[i + 1]
+                lower_surfaceY[i + 1] = lower_surfaceY[i]
+                lower_surfaceY[i] = temp_file_1
+
+                bubble = True
+
     centroidX = np.concatenate([lower_surfaceX, upper_surfaceX])
     centroidY = np.concatenate([lower_surfaceY, upper_surfaceY])
 
     if translateState:
-        centroidY = centroidY - translate_target
+        centroidX = centroidX + translate_target[0]
+        centroidY = centroidY + translate_target[1]
 
     centroid = np.vstack((centroidX, centroidY))
     plt.plot(centroid[0], centroid[1])
@@ -377,10 +392,10 @@ class DeflectionProfiles:
         self.camberline = camberline
         self.cX = centroid[0,:]
         self.cY = centroid[1,:]
-        self.tipX = np.max(self.cX)
+        self.tipX = np.min(self.cX)
         self.tipY = float(self.cY[np.where(self.cX == self.tipX)])
-        self.rootY1 = np.min(self.cY[1])
-        self.rootY2 = np.max(self.cY[-1])
+        self.rootY1 = self.cY[0]
+        self.rootY2 = self.cY[-1]
         self.rootX1 = float(self.cX[np.where(self.cY == self.rootY1)])
         self.rootX2 = float(self.cX[np.where(self.cY == self.rootY2)])
         self.rootmidpointX = np.abs(self.rootX2 + self.rootX1)/2
@@ -431,7 +446,7 @@ img_bool_cropped_camber, img_bool_cropped = cropimage(np.array(np.asarray(img_bo
 # imageVisualization(img_bool_cropped)
 # imageVisualization(img_bool_cropped_camber)
 
-img_bool_cropped_camber, img_bool_cropped = rotate(img_bool_cropped_camber,2), rotate(img_bool_cropped,2)
+img_bool_cropped_camber, img_bool_cropped = np.flip(img_bool_cropped_camber,1), np.flip(img_bool_cropped,1)
 
 camber_ = addcamber(img_bool_cropped_camber)[0]
 #plotBool(rotate(img_bool_cropped,3))
@@ -445,7 +460,7 @@ plt.legend(handles=[red_patch, blue_patch])
 plt.grid()
 
 df1 = DeflectionProfiles(camber_, centroid_)
-midpoint = (df1.camberline[0][0], df1.camberline[1][0])
+midpoint = (df1.camberline[0][-1], df1.camberline[1][-1])
 # print(df1.__dict__)
 
 ### Obtain target data
@@ -454,7 +469,7 @@ img_bool_file_target2 = load_file(img_bool_loc[9], separator=",", skip_last=True
 
 img_bool_cropped_camber_target, img_bool_cropped_target = cropimage(np.array(np.asarray(img_bool_file_target2), dtype=bool), np.array(np.asarray(img_bool_file_target1), dtype=bool))
 
-img_bool_cropped_camber_target, img_bool_cropped_target = rotate(img_bool_cropped_camber_target,2), rotate(img_bool_cropped_target,2)
+img_bool_cropped_camber_target, img_bool_cropped_target = np.flip(img_bool_cropped_camber_target,1), np.flip(img_bool_cropped_target,1)
 
 
 camber_target_, translate_target = addcamber(img_bool_cropped_camber_target, True)
