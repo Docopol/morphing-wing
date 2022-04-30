@@ -80,9 +80,9 @@ def addcamber(array: np.ndarray, translateState:bool = False) -> list:
         x = x + translate[0]
         y = y + translate[1]
     f = scp.interp1d(x, y, kind='cubic')
-    #plt.plot(x, y, color=colors[0], linestyle='--', dashes=(5, 20), linewidth=1)
-    plt.plot(x, y, color=colors[0])
-    #plt.plot(x, f(x), color=colors[0])
+    # plt.plot(x, y, color=colors[0], linestyle='--', dashes=(5, 20), linewidth=1)
+    # plt.plot(x, y, color=colors[0])
+    # plt.plot(x, f(x), color=colors[0])
     return [[x,y], translate]
 
 
@@ -369,7 +369,6 @@ def regress(array: np.ndarray, translateState:bool = False) -> np.ndarray:
         centroidY = centroidY + translate_target[1]
 
     centroid = np.vstack((centroidX, centroidY))
-    plt.plot(centroid[0], centroid[1])
     return centroid
 
 
@@ -412,10 +411,10 @@ class DeflectionProfiles:
         """
         self.dangle1 = math.atan2(abs(self.rootmidpointY-self.tipY),
                                   abs(self.rootmidpointX-self.tipX)) * 180 / math.pi
-        plt.plot(self.rootX1, self.rootY1, "ro")
-        plt.plot(self.rootX2, self.rootY2, "ko")
-        plt.plot(self.rootmidpointX, self.rootmidpointY, "ro")
-        plt.plot(self.tipX, self.tipY, "ro")
+        # plt.plot(self.rootX1, self.rootY1, "ro")
+        # plt.plot(self.rootX2, self.rootY2, "ko")
+        # plt.plot(self.rootmidpointX, self.rootmidpointY, "ro")
+        # plt.plot(self.tipX, self.tipY, "ro")
 
     def model2(self):
         """
@@ -423,6 +422,8 @@ class DeflectionProfiles:
         """
         self.dangle2 = math.atan2(abs(self.camberline[1][-1] - self.camberline[1][0]),
                                   abs(self.camberline[0][-1] - self.camberline[0][0])) * 180 / math.pi
+        # plt.plot(self.camberline[0][-1], self.camberline[1][-1], "bo")
+        # plt.plot(self.camberline[0][0], self.camberline[1][0], "bo")
 
     def printsummary(self):
         """
@@ -479,6 +480,11 @@ centroid_target_ = regress(img_grid_target, True)
 dft = DeflectionProfiles(camber_target_, centroid_target_)
 # print(dft.__dict__)
 
+plt.plot(centroid_[0]/4, centroid_[1]/4)
+plt.plot(centroid_target_[0]/4, centroid_target_[1]/4)
+plt.plot(camber_[0]/4, camber_[1]/4, color=colors[0])
+plt.plot(camber_target_[0]/4, camber_target_[1]/4, color=colors[0])
+
 plt.show()
 
 print(f"---------- Deflection angles - final ----------\n"
@@ -489,4 +495,4 @@ print(f"---------- Deflection angles - final ----------\n"
 # add fem plots
 # styling of plots
 # choose to present camber or chord (for deflec)
-#
+# alter code to only plot in the end
