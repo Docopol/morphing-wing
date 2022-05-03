@@ -50,6 +50,7 @@ avg_error_data = np.array([[np.average(error_data["Voltage power source [V]"][0:
                            ])
 print(avg_error_data)
 
+
 index_start_data = [7, 7, 10, 8, 10]  # dis1, dis2, dis3, dis4, csc3
 
 # ____Calculate the displacement of the actuator in mm
@@ -137,6 +138,11 @@ for disp_index in range(4):
 
     time_vs_current_disp.append(time_vs_current)
 
+error_displacement = avg_error_data[:, 0]/2*10  # displacement error mm
+error_force = f3(current_real_interpolation(psv_interp_cal(avg_error_data[:, 1])))
+print(error_displacement)
+print(error_force)
+
 # ____put plots below____
 
 # DELIVERABLE 1: displacement vs time plot FINISHED!!!!!!!!!!
@@ -148,7 +154,7 @@ for index3 in range(4):
     plt.xlabel("Time [s]")
     plt.ylabel("Displacement [mm]")
     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
-    plt.plot(all_data[index3][:, 0], all_data[index3][:, 1], linestyle=lineshape[index3], label=label[index3],
+    plt.plot(all_data[index3][:, 0], all_data[index3][:, 1]-error_displacement[index3], linestyle=lineshape[index3], label=label[index3],
              color=colors_rgb[index3])
     plt.legend()
 
@@ -159,12 +165,12 @@ plt.xlabel("Time [s]")
 plt.ylabel("Force [N]")
 plt.scatter([2.915, 5.4, 7.75, 10], calibration_data[2]["Actuation force [N]"][:], label="FEM data")
 
-print(min(f3(time_vs_current_disp[3][:, 1])))
+
 
 for index3 in range(4):
     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
     plt.plot(time_vs_current_disp[index3][:, 0],
-             f3(time_vs_current_disp[index3][:, 1]) - min(f3(time_vs_current_disp[index3][:, 1])),
+             f3(time_vs_current_disp[index3][:, 1]) - error_force[index3],
              linestyle=lineshape[index3], label=label[index3], color=colors_rgb[index3])
 
 plt.legend()
