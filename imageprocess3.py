@@ -480,10 +480,29 @@ centroid_target_ = regress(img_grid_target, True)
 dft = DeflectionProfiles(camber_target_, centroid_target_)
 # print(dft.__dict__)
 
-plt.plot(centroid_[0]/4, centroid_[1]/4)
-plt.plot(centroid_target_[0]/4, centroid_target_[1]/4)
-plt.plot(camber_[0]/4, camber_[1]/4, color=colors[0])
-plt.plot(camber_target_[0]/4, camber_target_[1]/4, color=colors[0])
+reducescale = (df1.rootY1 - df1.rootY2) / (dft.rootY1 - dft.rootY2)
+scale = 1
+
+contour_x = centroid_target_[0] * reducescale
+contour_y = centroid_target_[1] * reducescale
+
+camber_x = camber_target_[0] * reducescale
+camber_y = camber_target_[1] * reducescale
+
+translate_x = midpoint[0] - camber_x[-1]
+translate_y = midpoint[1] - camber_y[-1]
+
+contour_x += translate_x
+contour_y += translate_y
+
+camber_x += translate_x
+camber_y += translate_y
+
+
+plt.plot(centroid_[0]/scale, centroid_[1]/scale)
+plt.plot(contour_x / scale, contour_y / scale)
+plt.plot(camber_[0]/scale, camber_[1]/scale, color=colors[0])
+plt.plot(camber_x / scale, camber_y / scale, color=colors[0])
 
 plt.show()
 
