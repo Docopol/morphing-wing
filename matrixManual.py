@@ -22,6 +22,6 @@ def matrixManual(theta, eps_1, eps_2, eps_4):
     Qe_12 = c_1*eps_4+s_1*eps_2
 
     # Since we only need epsilon xx, which is the first element of the final matrix, here it is:
-    eps_along_camber = c_1*Qe_11+c_1*Qe_12
+    eps_along_camber = float(c_1*Qe_11+c_1*Qe_12)
 
     return eps_along_camber
