@@ -8,6 +8,8 @@ import math
 from PIL import Image
 from scipy.misc import derivative
 
+from optimalshapeplot import coordinates_skin
+
 from utils.other import perftimer
 from utils.filereader import files_in_directory
 from utils.filereader import load_file
@@ -467,7 +469,6 @@ midpoint = (df1.camberline[0][-1], df1.camberline[1][-1])
 ### Obtain target data
 img_bool_file_target1 = load_file(img_bool_loc[8], separator=",", skip_last=True)
 img_bool_file_target2 = load_file(img_bool_loc[9], separator=",", skip_last=True)
-
 img_bool_cropped_camber_target, img_bool_cropped_target = cropimage(np.array(np.asarray(img_bool_file_target2), dtype=bool), np.array(np.asarray(img_bool_file_target1), dtype=bool))
 
 img_bool_cropped_camber_target, img_bool_cropped_target = np.flip(img_bool_cropped_camber_target,1), np.flip(img_bool_cropped_target,1)
@@ -480,44 +481,7 @@ centroid_target_ = regress(img_grid_target, True)
 dft = DeflectionProfiles(camber_target_, centroid_target_)
 # print(dft.__dict__)
 
-reducescale = (df1.rootY1 - df1.rootY2) / (dft.rootY1 - dft.rootY2)
-scale = 4
-
-contour_x = centroid_target_[0] * reducescale
-contour_y = centroid_target_[1] * reducescale
-
-camber_x = camber_target_[0] * reducescale
-camber_y = camber_target_[1] * reducescale
-
-translate_x = midpoint[0] - camber_x[-1]
-translate_y = midpoint[1] - camber_y[-1]
-
-contour_x += translate_x
-contour_y += translate_y
-
-camber_x += translate_x
-camber_y += translate_y
-
-
-plt.plot(centroid_[0]/scale, centroid_[1]/scale)
-plt.plot(contour_x / scale, contour_y / scale)
-plt.plot(camber_[0]/scale, camber_[1]/scale, color=colors[0])
-plt.plot(camber_x / scale, camber_y / scale, color=colors[0])
-
-
-
-print(f"---------- Deflection angles - final ----------\n"
-      f"model1: {dft.dangle1 - df1.dangle1:.5f} degrees\n"
-      f"model2: {dft.dangle2 - df1.dangle2:.5f} degrees")
-
-# to do
-# add fem plots
-# styling of plots
-# choose to present camber or chord (for deflec)
-# alter code to only plot in the end
 #######################
-
-from math import atan
 
 def readFile(data_file: str):
     data_file = pd.read_csv(data_file, sep="\t")
@@ -556,7 +520,6 @@ def nodeDistanceAndOrientation(data_file: np.ndarray):
         node_distance[data_file_row, 0] = np.sqrt(dx ** 2 + dy ** 2)
         node_orientation[data_file_row] = np.arctan(dy/dx)
 
-
     return node_distance, node_orientation
 
 
@@ -568,81 +531,81 @@ def nodeLocation(node_distances: np.ndarray) -> np.ndarray:
 
 
 loadstep1_disp = reformatFile(readFile("Data/FEM/shell_loadstep1_disp.out"))[2:, :] # first two nodes are deleted for weird placement
-loadstep2_disp = reformatFile(readFile("Data/FEM/shell_loadstep2_disp.out"))[2:, :]
-loadstep3_disp = reformatFile(readFile("Data/FEM/shell_loadstep3_disp.out"))[2:, :]
-loadstep4_disp = reformatFile(readFile("Data/FEM/shell_loadstep4_disp.out"))[2:, :]
 loadstep5_disp = reformatFile(readFile("Data/FEM/shell_loadstep5_disp.out"))[2:, :]
 
 loadstep1_disp_nodes, loadstep1_node_orientation = nodeDistanceAndOrientation(loadstep1_disp)
-loadstep2_disp_nodes, loadstep2_node_orientation = nodeDistanceAndOrientation(loadstep2_disp)
-loadstep3_disp_nodes, loadstep3_node_orientation = nodeDistanceAndOrientation(loadstep3_disp)
-loadstep4_disp_nodes, loadstep4_node_orientation = nodeDistanceAndOrientation(loadstep4_disp)
 loadstep5_disp_nodes, loadstep5_node_orientation = nodeDistanceAndOrientation(loadstep5_disp)
 
 loadstep1_disp_loc = nodeLocation(loadstep1_disp_nodes)
-loadstep2_disp_loc = nodeLocation(loadstep2_disp_nodes)
-loadstep3_disp_loc = nodeLocation(loadstep3_disp_nodes)
-loadstep4_disp_loc = nodeLocation(loadstep4_disp_nodes)
 loadstep5_disp_loc = nodeLocation(loadstep5_disp_nodes)
 
-# print(sum(loadstep1_disp_nodes))
-# print(sum(loadstep2_disp_nodes))
-# print(sum(loadstep3_disp_nodes))
-# print(sum(loadstep4_disp_nodes))
-#print(sum(loadstep5_disp_nodes))
-
-
-'''Below plots the leading edge shapes for 5 loadsteps for mm'''
-
-#plt.plot(loadstep1_disp[:, 1] + loadstep1_disp[:, 4], loadstep1_disp[:, 2] + loadstep1_disp[:, 5],
-#            label="Loadstep 1")
-#plt.plot(loadstep2_disp[:, 1] + loadstep2_disp[:, 4], loadstep2_disp[:, 2] + loadstep2_disp[:, 5],
-#            label="Loadstep 2")
-#plt.plot(loadstep3_disp[:, 1] + loadstep3_disp[:, 4], loadstep3_disp[:, 2] + loadstep3_disp[:, 5],
-#            label="Loadstep 3")
-#plt.plot(loadstep4_disp[:, 1] + loadstep4_disp[:, 4], loadstep4_disp[:, 2] + loadstep4_disp[:, 5],
-#            label="Loadstep 4")
-#plt.plot(loadstep5_disp[:, 1] + loadstep5_disp[:, 4], loadstep5_disp[:, 2] + loadstep5_disp[:, 5],
-#            label="Loadstep 5")
-
-#plt.legend()
-#plt.show()
 
 loadstep1_coord_x = (loadstep1_disp[:, 1] + loadstep1_disp[:, 4])*1000 #output converted to mm
 loadstep1_coord_y = (loadstep1_disp[:, 2] + loadstep1_disp[:, 5])*1000 + 134.28528#shifted up so that leading edge lower side starts at y=0
-loadstep2_coord_x = (loadstep2_disp[:, 1] + loadstep2_disp[:, 4])*1000
-loadstep2_coord_y = (loadstep2_disp[:, 2] + loadstep2_disp[:, 5])*1000+ 134.28528
-loadstep3_coord_x = (loadstep3_disp[:, 1] + loadstep3_disp[:, 4])*1000
-loadstep3_coord_y = (loadstep3_disp[:, 2] + loadstep3_disp[:, 5])*1000+ 134.28528
-loadstep4_coord_x = (loadstep4_disp[:, 1] + loadstep4_disp[:, 4])*1000
-loadstep4_coord_y = (loadstep4_disp[:, 2] + loadstep4_disp[:, 5])*1000+ 134.28528
-loadstep5_coord_x = (loadstep5_disp[:, 1] + loadstep5_disp[:, 4])*1000
-loadstep5_coord_y = (loadstep5_disp[:, 2] + loadstep5_disp[:, 5])*1000+ 134.28528
+loadstep5_coord_x = (loadstep5_disp[:, 1] + loadstep5_disp[:, 4])*1000 + 17.5
+loadstep5_coord_y = (loadstep5_disp[:, 2] + loadstep5_disp[:, 5])*1000 + 134.28528
 
 plt.xlabel("Position in X direction")
 plt.ylabel("Position in Y direction")
-#plt.plot(loadstep2_disp[:, 1] + loadstep2_disp[:, 4], loadstep2_disp[:, 2] + loadstep2_disp[:, 5],
-#            label="Loadstep 2")
-#plt.plot(loadstep3_disp[:, 1] + loadstep3_disp[:, 4], loadstep3_disp[:, 2] + loadstep3_disp[:, 5],
-#            label="Loadstep 3")
-#plt.plot(loadstep4_disp[:, 1] + loadstep4_disp[:, 4], loadstep4_disp[:, 2] + loadstep4_disp[:, 5],
-#            label="Loadstep 4")
-#plt.plot(loadstep5_disp[:, 1] + loadstep5_disp[:, 4], loadstep5_disp[:, 2] + loadstep5_disp[:, 5],
-#            label="Loadstep 5")
-
 
 plt.plot(loadstep1_coord_x,loadstep1_coord_y,
             label="Loadstep 1")
-#plt.plot(loadstep2_coord_x,loadstep2_coord_y,
-#            label="Loadstep 2")
-#plt.plot(loadstep3_coord_x,loadstep3_coord_y,
-#            label="Loadstep 3")
-#plt.plot(loadstep4_coord_x,loadstep4_coord_y,
-#            label="Loadstep 4")
 plt.plot(loadstep5_coord_x,loadstep5_coord_y,
             label="Loadstep 5")
 
+reducescale = (df1.rootY1 - df1.rootY2) / (dft.rootY1 - dft.rootY2)
+scale = 5.75
+
+contour_x = centroid_target_[0] * reducescale
+contour_y = centroid_target_[1] * reducescale
+
+camber_x = camber_target_[0] * reducescale
+camber_y = camber_target_[1] * reducescale
+
+translate_x = midpoint[0] - camber_x[-1]
+translate_y = midpoint[1] - camber_y[-1]
+
+contour_x += translate_x
+contour_y += translate_y
+
+camber_x += translate_x
+camber_y += translate_y
+
+coordinates_skin /= 1
+
+contour_tip = (np.min(contour_x), contour_y[np.where(contour_x == np.min(contour_x))])
+contour_tip_t = (np.min(coordinates_skin[0]),
+                 coordinates_skin[1][np.where(coordinates_skin[0] == np.min(coordinates_skin[0]))[0][2]]+3)
+
+print(contour_tip)
+print(contour_tip_t)
+
+
+plt.plot(centroid_[0]/scale, centroid_[1]/scale)
+plt.plot(contour_x / scale, contour_y / scale)
+plt.plot(camber_[0]/scale, camber_[1]/scale, color=colors[0])
+plt.plot(camber_x / scale, camber_y / scale, color=colors[0])
+
+
+print(f"---------- Deflection angles - final ----------\n"
+      f"model1: {dft.dangle1 - df1.dangle1:.5f} degrees\n"
+      f"model2: {dft.dangle2 - df1.dangle2:.5f} degrees")
 
 
 plt.show()
 
+# Fem compared to exp 1
+red_patch = mpatches.Patch(color='orange', label='Target shape')
+blue_patch = mpatches.Patch(color='blue', label='Initial pos')
+plt.legend(handles=[red_patch, blue_patch])
+plt.grid()
+plt.plot(centroid_[0]/scale, centroid_[1]/scale)
+plt.plot(contour_x / scale, contour_y / scale)
+plt.plot(camber_[0]/scale, camber_[1]/scale, color=colors[0])
+plt.plot(camber_x / scale, camber_y / scale, color=colors[0])
+plt.plot(coordinates_skin[0] + (contour_tip[0]/scale)-contour_tip_t[0], coordinates_skin[1] + (contour_tip[1]/scale) -contour_tip_t[1])
+plt.show()
+
+# Fem compared to exp 1
+
+# exp compared to exp
