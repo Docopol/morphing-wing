@@ -126,7 +126,7 @@ plt.plot(loadstep4_coord_x,loadstep4_coord_y,
             label="Loadstep 4")
 plt.plot(loadstep5_coord_x,loadstep5_coord_y,
             label="Loadstep 5")
-
+plt.plot()
 plt.plot()
 plt.legend()
 plt.show()
