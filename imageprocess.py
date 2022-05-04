@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import scipy.interpolate as scp
 import math
 
@@ -19,6 +20,8 @@ cut_up = 0
 cut_down = 0
 subgrid_size = 25
 
+# Styling variables
+colors = ["k", "b"]
 
 @perftimer
 def imageVisualization(file, show_colorbar:bool = False, name:str = "") -> None:
@@ -50,24 +53,34 @@ def loadRGBandBOOL(file: str, usepil: bool = False) -> list:
     file_bool = np.asarray(np.zeros((np.copy(image_colordata).shape[:2]), dtype=bool))
     return [np.asarray(image_colordata), file_bool]
 
+
 @perftimer
-def addcamber(array: np.ndarray) -> list:
+def addcamber(array: np.ndarray, translateState:bool = False) -> list:
     """
     :param array: array containing boolean values based on the location of the camber line.
     on locations where a camber line can be found the array item will have a value of 1, no camber is 0.
     note: the size of the array(after cropping(same crop func as contour)) is equal to the cropped array representing the contour.
+    :param translateState: Boolean value which is True for the target plot allowing for the translation of the plot
     :return: x and y locations of camber points + addition of points to plot
     """
+    translate = 0
+
     points = np.argwhere(array == 1)
     x = []
     y = []
     for i in points:
         x.append(i[0])
         y.append(i[1])
-    x = np.array(x)
-    y = np.array(y)
-    plt.plot(x,y,"k")
-    return [x,y]
+    x = np.array(x)[:-1]
+    y = np.array(y)[:-1]
+    if translateState:
+        translate = y[0] - midpoint[1]
+        y = y - translate
+    f = scp.interp1d(x, y, kind='cubic')
+    #plt.plot(x, y, color=colors[0], linestyle='--', dashes=(5, 20), linewidth=1)
+    plt.plot(x, y, color=colors[0])
+    #plt.plot(x, f(x), color=colors[0])
+    return [[x,y], translate]
 
 
 # Outdated function used for debugging
@@ -82,7 +95,7 @@ def plotBoolpoints(array: np.ndarray, line: list = None) -> None:
         x_avg = line[3]
         y_avg = line[4]
         plt.plot(x, a*x + b)
-        plt.plot(x_avg, y_avg, 'ro')
+        plt.plot(x_avg, y_avg)
     plt.show()
 
 
@@ -205,11 +218,12 @@ def creategrid(array_bool: np.ndarray, usedict:bool = False):
 
 
 @perftimer
-def regress(array: np.ndarray) -> np.ndarray:
+def regress(array: np.ndarray, translateState:bool = False) -> np.ndarray:
     """
     :param array: 4 dimensional array containing subgrids,
     using the subgrids the contour of the airfoil can be approximated using a linear approximation.
     linear approximation used: Least squares
+    :param translateState: Boolean value which is True for the target plot allowing for the translation of the plot
     :return: Centroid locations of the least squares pieces [np.array([x-points]), np.array([x-points])].
     Pyplot containing the approximated airfoil contour
     """
@@ -265,9 +279,9 @@ def regress(array: np.ndarray) -> np.ndarray:
 
         x = np.array(list(set(x)))
 
-        plt.plot(x, a * x + b, "black")
+        ##plt.plot(x, a * x + b, "black")
 
-        ## plt.plot(x_avg, y_avg, 'ro') # plot centroid points (DEBUG)
+        #plt.plot(x_avg, y_avg, 'k.') # plot centroid points (DEBUG)
 
         return [x, a, b, x_avg, y_avg]
 
@@ -281,8 +295,9 @@ def regress(array: np.ndarray) -> np.ndarray:
     centroidY = []
 
     # perform least squares for every subgrid in main global array
-    for i in range(int(size[0])):
-        for j in range(int(size[1])):
+    # scanner which starts at the bottom left, and goes to the right (layer per layer)
+    for j in range(int(size[1])-1,-1,-1):
+        for i in range(int(size[0])):
             loc_array = array[i,j]
             if np.count_nonzero(loc_array == True):
                 ## some debugging code (DEBUG)
@@ -300,8 +315,46 @@ def regress(array: np.ndarray) -> np.ndarray:
                 centroidX.append(res[3])
                 centroidY.append(res[4])
 
+    # convert centroid list to arrays
+    centroidX = np.array(centroidX)
+    centroidY = np.array(centroidY)
+
+    # find contour tip x location
+    xtiploc = int(np.where(centroidX == np.max(centroidX))[0])
+
+    # Split contour into x and y and top and bottom
+    lower_surfaceX = centroidX[0: xtiploc]
+    upper_surfaceX = centroidX[xtiploc:]
+
+    lower_surfaceY = centroidY[0: xtiploc]
+    upper_surfaceY = centroidY[xtiploc:]
+
+    # sort the contour centroid values for correct plotting
+    bubble = True
+
+    while bubble:
+        bubble = False
+        for i in range(len(upper_surfaceX) - 1):
+            if upper_surfaceX[i + 1] > upper_surfaceX[i]:
+
+                temp_file = upper_surfaceX[i + 1]
+                upper_surfaceX[i + 1] = upper_surfaceX[i]
+                upper_surfaceX[i] = temp_file
+
+                temp_file_1 = upper_surfaceY[i + 1]
+                upper_surfaceY[i + 1] = upper_surfaceY[i]
+                upper_surfaceY[i] = temp_file_1
+
+                bubble = True
+
+    centroidX = np.concatenate([lower_surfaceX, upper_surfaceX])
+    centroidY = np.concatenate([lower_surfaceY, upper_surfaceY])
+
+    if translateState:
+        centroidY = centroidY - translate_target
+
     centroid = np.vstack((centroidX, centroidY))
-    plt.show()
+    plt.plot(centroid[0], centroid[1])
     return centroid
 
 
@@ -324,10 +377,10 @@ class DeflectionProfiles:
         self.camberline = camberline
         self.cX = centroid[0,:]
         self.cY = centroid[1,:]
-        self.tipX = np.min(self.cX)
+        self.tipX = np.max(self.cX)
         self.tipY = float(self.cY[np.where(self.cX == self.tipX)])
-        self.rootY1 = np.min(self.cY)
-        self.rootY2 = np.max(self.cY)
+        self.rootY1 = np.min(self.cY[1])
+        self.rootY2 = np.max(self.cY[-1])
         self.rootX1 = float(self.cX[np.where(self.cY == self.rootY1)])
         self.rootX2 = float(self.cX[np.where(self.cY == self.rootY2)])
         self.rootmidpointX = np.abs(self.rootX2 + self.rootX1)/2
@@ -336,6 +389,7 @@ class DeflectionProfiles:
         self.dangle2 = 0
         self.model1()
         self.model2()
+        self.printsummary()
 
     def model1(self):
         """
@@ -343,6 +397,10 @@ class DeflectionProfiles:
         """
         self.dangle1 = math.atan2(abs(self.rootmidpointY-self.tipY),
                                   abs(self.rootmidpointX-self.tipX)) * 180 / math.pi
+        plt.plot(self.rootX1, self.rootY1, "ro")
+        plt.plot(self.rootX2, self.rootY2, "ko")
+        plt.plot(self.rootmidpointX, self.rootmidpointY, "ro")
+        plt.plot(self.tipX, self.tipY, "ro")
 
     def model2(self):
         """
@@ -351,25 +409,13 @@ class DeflectionProfiles:
         self.dangle2 = math.atan2(abs(self.camberline[1][-1] - self.camberline[1][0]),
                                   abs(self.camberline[0][-1] - self.camberline[0][0])) * 180 / math.pi
 
-
-    # for local gradient, but shouldn't be to important
-    def model3(self):
-        f = scp.interp1d(self.camberline[0], self.camberline[1], kind='linear')
-        print(f.__dict__)
-        # fprime = derivative(f, 1.0, dx=1e-6)
-        plt.plot(self.camberline[0], f(self.camberline[0]))
-        plt.show()
-
-    def model4(self):
-        pass
-
     def printsummary(self):
         """
         :return: summary of the deflection angles
         """
         print("---------- Deflection angles - summary ----------")
         print(f"model1: {self.dangle1} degrees")
-        print(f"model1: {self.dangle2} degrees")
+        print(f"model2: {self.dangle2} degrees")
 
 
 # -----------------
@@ -381,34 +427,51 @@ img_bool_loc = files_in_directory("csv_bool/csv_final_maybe", "csv")
 img_bool_file1 = load_file(img_bool_loc[0], separator=",", skip_last=True)
 img_bool_file2 = load_file(img_bool_loc[1], separator=",", skip_last=True)
 
-# imageVisualization(img_bool_file)
 img_bool_cropped_camber, img_bool_cropped = cropimage(np.array(np.asarray(img_bool_file2), dtype=bool), np.array(np.asarray(img_bool_file1), dtype=bool))
-imageVisualization(img_bool_cropped)
-imageVisualization(img_bool_cropped_camber)
+# imageVisualization(img_bool_cropped)
+# imageVisualization(img_bool_cropped_camber)
 
-camber_ = addcamber(img_bool_cropped_camber)
+img_bool_cropped_camber, img_bool_cropped = rotate(img_bool_cropped_camber,2), rotate(img_bool_cropped,2)
+
+camber_ = addcamber(img_bool_cropped_camber)[0]
 #plotBool(rotate(img_bool_cropped,3))
 img_grid = creategrid(img_bool_cropped)
 centroid_ = regress(img_grid)
 
-# df1 = DeflectionProfiles(camber_, centroid_)
+
+red_patch = mpatches.Patch(color='orange', label='Target shape')
+blue_patch = mpatches.Patch(color='blue', label='Initial pos')
+plt.legend(handles=[red_patch, blue_patch])
+plt.grid()
+
+df1 = DeflectionProfiles(camber_, centroid_)
+midpoint = (df1.camberline[0][0], df1.camberline[1][0])
 # print(df1.__dict__)
 
-
 ### Obtain target data
-# img_bool_file_target1 = load_file(img_bool_loc[], separator=",", skip_last=True)
-# img_bool_file_target2 = load_file(img_bool_loc[], separator=",", skip_last=True)
-#
-# img_bool_cropped_camber_target, img_bool_cropped_target = cropimage(np.array(np.asarray(img_bool_file_target2), dtype=bool), np.array(np.asarray(img_bool_file_target1), dtype=bool))
-#
-# camber_target_ = addcamber(img_bool_cropped_camber_target)
-# img_grid_target = creategrid(img_bool_cropped_target)
-# centroid_target_ = regress(img_grid_target)
+img_bool_file_target1 = load_file(img_bool_loc[8], separator=",", skip_last=True)
+img_bool_file_target2 = load_file(img_bool_loc[9], separator=",", skip_last=True)
 
-# dft = DeflectionProfiles(camber_target_, centroid_target_)
+img_bool_cropped_camber_target, img_bool_cropped_target = cropimage(np.array(np.asarray(img_bool_file_target2), dtype=bool), np.array(np.asarray(img_bool_file_target1), dtype=bool))
+
+img_bool_cropped_camber_target, img_bool_cropped_target = rotate(img_bool_cropped_camber_target,2), rotate(img_bool_cropped_target,2)
+
+
+camber_target_, translate_target = addcamber(img_bool_cropped_camber_target, True)
+img_grid_target = creategrid(img_bool_cropped_target)
+centroid_target_ = regress(img_grid_target, True)
+
+dft = DeflectionProfiles(camber_target_, centroid_target_)
 # print(dft.__dict__)
 
-# present results
-# plt.show()
+plt.show()
 
-# deflection angle realtive to target (substract both data points)
+print(f"---------- Deflection angles - final ----------\n"
+      f"model1: {dft.dangle1 - df1.dangle1:.5f} degrees\n"
+      f"model2: {dft.dangle2 - df1.dangle2:.5f} degrees")
+
+# to do
+# add fem plots
+# styling of plots
+# choose to present camber or chord (for deflec)
+#

@@ -48,7 +48,7 @@ for i in range (5):
     ax[0,0].set_title('Inside Experimental vs FEM strains')
     ax[0,0].plot(experimentDatas[timeStamps[i]][0][2], experimentDatas[timeStamps[i]][1][2], label = 'Experimental Loop C', color = 'lime', ls = '-.') 
     ax[0,0].plot(experimentDatas[timeStamps[i]][0][3], experimentDatas[timeStamps[i]][1][3], label = 'Experimental Loop D', color = 'darkred', ls = '--') 
-    ax[0,0].plot(np.flip(femNodeLocations[i]), (processedFEMData2s [i][:,1]-processedFEMData2s [0][:,1])* 10 ** 6, label = 'FEM', color = 'hotpink') #"calibration" is the - part
+    ax[0,0].plot(np.flip(femNodeLocations[i]), processedFEMData2s [i][:,1]* 10 ** 6, label = 'FEM', color = 'hotpink') #"calibration" is the - part
     
     ax[0,0].set_ylabel('Microstrain [μm/m]')
     ax[0,0].set_xlabel('Length along contour [m]')
@@ -60,7 +60,7 @@ for i in range (5):
     ax[0,1].set_title('Outside Experimental vs FEM strains')
     ax[0,1].plot(experimentDatas[timeStamps[i]][0][0], experimentDatas[timeStamps[i]][1][0], label = 'Experimental Loop A', color = 'lime', ls = '-.') 
     ax[0,1].plot(experimentDatas[timeStamps[i]][0][1], experimentDatas[timeStamps[i]][1][1], label = 'Experimental Loop B', color = 'darkred', ls = '--') 
-    ax[0,1].plot(np.flip(femNodeLocations[i]), (processedFEMData1s [i][:,1]-processedFEMData1s [0][:,1])* 10 ** 6, label = 'FEM', color = 'hotpink')
+    ax[0,1].plot(np.flip(femNodeLocations[i]), processedFEMData1s [i][:,1]* 10 ** 6, label = 'FEM', color = 'hotpink')
     
     ax[0,1].set_ylabel('Microstrain [μm/m]')
     ax[0,1].set_xlabel('Length along contour [m]')

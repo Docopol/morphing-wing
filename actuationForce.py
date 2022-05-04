@@ -35,10 +35,28 @@ calibration_data = [readFile("Data/DispAndForce/CurrentSensorCalibration3.csv"),
                     readFile("Data/DispAndForce/CurentVoltageReading3.csv"),
                     readFile("Data/DispAndForce/femForceDisplacement.csv")]
 
+error_data = readFile("Data/DispAndForce/error.csv")
+
+avg_error_data = np.array([[np.average(error_data["Voltage power source [V]"][0:7]),
+                            np.average(error_data["Voltage current sensor [V]"][0:7])],
+                           [np.average(error_data["Voltage power source [V]"][7:14]),
+                            np.average(error_data["Voltage current sensor [V]"][7:14])],
+                           [np.average(error_data["Voltage power source [V]"][14:25]),
+                            np.average(error_data["Voltage current sensor [V]"][14:25])],
+                           [np.average(error_data["Voltage power source [V]"][25:33]),
+                            np.average(error_data["Voltage current sensor [V]"][25:33])],
+                           [np.average(error_data["Voltage power source [V]"][33:44]),
+                            np.average(error_data["Voltage current sensor [V]"][33:44])],
+                           ])
+print(avg_error_data)
+
+
+index_start_data = [7, 7, 10, 8, 10]  # dis1, dis2, dis3, dis4, csc3
+
 # ____Calculate the displacement of the actuator in mm
 actuator_disp = []
 for index_dis in range(len(data_real[:])):
-    actuator_disp.append(10 * data_real[index_dis]["Voltage power source [V]"][:] / 2)
+    actuator_disp.append(10 * (data_real[index_dis]["Voltage power source [V]"][:] ) / 2)
 
 # ____Calculate the current with the real power source voltages and the calibrationVoltageReadings3
 
@@ -53,14 +71,16 @@ for h in range(len(data_real[:])):
     current_x = np.zeros((len(data_real[h]["Voltage power source [V]"][:]), 2))
     for i in range(len(data_real[h]["Voltage power source [V]"][:])):
         current_x[i, 0] = data_real[h]["Time [s]"][i]
-        current_x[i, 1] = current_real_interpolation(data_real[h]["Voltage power source [V]"][i])
+        current_x[i, 1] = current_real_interpolation(data_real[h]["Voltage power source [V]"][i] )
     current_real.append(current_x)  # current_real is a 4xix2 matrix with time and current on the axis
 
 # order data
 all_data = []
+
 for index_dis_csv in range(len(data_real[:])):
 
     all_data_i = np.zeros((len(data_real[index_dis_csv]["Time [s]"][:]), 7))
+
     for index_total in range(len(data_real[index_dis_csv]["Time [s]"][:])):
         all_data_i[index_total, 0] = data_real[index_dis_csv]["Time [s]"][index_total] - \
                                      data_real[index_dis_csv]["Time [s]"][0]
@@ -118,78 +138,40 @@ for disp_index in range(4):
 
     time_vs_current_disp.append(time_vs_current)
 
-print(time_vs_current_disp)
-# print(max(all_data[2][:, 2]))
-# print(all_data[2][:, 1])
+error_displacement = avg_error_data[:, 0]/2*10  # displacement error mm
+error_force = f3(current_real_interpolation(psv_interp_cal(avg_error_data[:, 1])))
+print(error_displacement)
+print(error_force)
 
 # ____put plots below____
 
 # DELIVERABLE 1: displacement vs time plot FINISHED!!!!!!!!!!
 lineshape = ['dashed', 'dotted', 'dashdot', 'solid']
-colors_rgb = ['blue' , 'orange', 'red', 'green']
+colors_rgb = ['blue', 'orange', 'red', 'green']
 markers = ['o', '+', 's', '*']
+
 for index3 in range(4):
     plt.xlabel("Time [s]")
     plt.ylabel("Displacement [mm]")
     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
-    plt.plot(all_data[index3][:, 0], all_data[index3][:, 1], linestyle=lineshape[index3], label=label[index3], color=colors_rgb[index3])
+    plt.plot(all_data[index3][:, 0], all_data[index3][:, 1]-error_displacement[index3], linestyle=lineshape[index3], label=label[index3],
+             color=colors_rgb[index3])
     plt.legend()
 
 plt.show()
-
-# plt.xlabel("Time [s]")
-# plt.ylabel("Voltage power source [V]")
-# plt.plot(calibration_data[0]["Time [s]"][:], calibration_data[0]["Voltage power source [V]"][:])
-# plt.show()
-
-
-# for index4 in range(4):
-#     plt.xlabel("Time [s]")
-#     plt.ylabel("Current [A]")
-#     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
-#     plt.plot(all_data[index4][:, 0], all_data[index4][:, 3], label = label[index4])
-#     plt.legend()
-#
-# plt.show()
-
-
-# for index3 in range(4):
-#     plt.xlabel("Time [s]")
-#     plt.ylabel("Voltage current sensor [V]")
-#     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
-#     plt.plot(all_data[index3][:, 0], all_data[index3][:, 5], label=label[index3])
-#     plt.legend()
-#
-# plt.show()
-#
-# plt.xlabel("Time [s]")
-# plt.ylabel("Voltage current sensor [V]")
-# label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
-# plt.plot(calibration_data[0]["Time [s]"][:], calibration_data[0]["Voltage current sensor [V]"][:])
-# plt.show()
-
-# for index3 in range(4):
-#     plt.xlabel("Time [s]")
-#     plt.ylabel("Voltage power source [V]")
-#     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
-#     plt.plot(time_vs_current_disp[index3][:, 0], time_vs_current_disp[index3][:, 1], label=label[index3])
-#     plt.legend()
-#
-# plt.show()
-
 
 # DELIVERABLE 2: force time plot FINISHED!!!!!!!!!!!!
 plt.xlabel("Time [s]")
 plt.ylabel("Force [N]")
 plt.scatter([2.915, 5.4, 7.75, 10], calibration_data[2]["Actuation force [N]"][:], label="FEM data")
 
-print(min(f3(time_vs_current_disp[3][:, 1])))
+
 
 for index3 in range(4):
     label = ["Target: 10 mm", "Target: 20 mm", "Target: 30 mm", "Target: 39.2 mm"]
     plt.plot(time_vs_current_disp[index3][:, 0],
-                f3(time_vs_current_disp[index3][:, 1]) - min(f3(time_vs_current_disp[3][:, 1])),
-                linestyle=lineshape[index3], label=label[index3], color=colors_rgb[index3])
+             f3(time_vs_current_disp[index3][:, 1]) - error_force[index3],
+             linestyle=lineshape[index3], label=label[index3], color=colors_rgb[index3])
 
 plt.legend()
 plt.show()
