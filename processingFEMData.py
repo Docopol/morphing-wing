@@ -43,31 +43,29 @@ def matrixMultiplication (rownumber:int, loadstepNumber:int, femStrainDataSetFor
        '''
        theta = angleDefinition (loadstepNumber, rownumber, femStrainDataSetForLoadsteps)
 
-       '''Qs = np.matrix([[np.cos(theta), np.sin(theta), 0], 
+       Qs = np.matrix([[np.cos(theta), np.sin(theta), 0], 
               [-np.sin(theta), np.cos(theta),0], 
               [0,0,1]])
        epsilons = np.matrix([[femStrainDataSetForLoadsteps[rownumber,1], femStrainDataSetForLoadsteps[rownumber,4], femStrainDataSetForLoadsteps[rownumber,6]],
               [femStrainDataSetForLoadsteps[rownumber,4], femStrainDataSetForLoadsteps[rownumber,2], femStrainDataSetForLoadsteps[rownumber,5]],
               [femStrainDataSetForLoadsteps[rownumber,6], femStrainDataSetForLoadsteps[rownumber,5], femStrainDataSetForLoadsteps[rownumber,3]]
-              ])'''
+              ])
 
-       epsilon_along_camber = matrixManual (theta, femStrainDataSetForLoadsteps[rownumber,1], femStrainDataSetForLoadsteps[rownumber,2], femStrainDataSetForLoadsteps[rownumber,4])
-       '''transformationMatrixs = np.matmul(Qs, epsilons, Qs.T)
-       return transformationMatrixs'''
-       return epsilon_along_camber
+
+       transformationMatrixs = np.matmul(Qs, epsilons, Qs.T)
+       return transformationMatrixs
+
 
 #StrainData1s
 processedFEMData1s = np.zeros ([np.shape (femStrainData1s)[0], np.shape (femStrainData1s)[1]-1, 2])#-1 comes from the fact that there is forward linear interpolation which ommits the last data point
 for i in range (np.shape (processedFEMData1s)[0]):
        for j in range (np.shape (processedFEMData1s)[1]): 
               processedFEMData1s [i][j][0] = femStrainData1s[i][j][0]
-              processedFEMData1s [i][j][1] = matrixMultiplication(j,i,femStrainData1s[i])
-              'processedFEMData1s [i][j][1]= float(matrixMultiplication(j,i,femStrainData1s[i])[0,0])'
+              processedFEMData1s [i][j][1]= float(matrixMultiplication(j,i,femStrainData1s[i])[0,0])
 
 #StrainData2s
 processedFEMData2s = np.zeros ([np.shape (femStrainData2s)[0], np.shape (femStrainData2s)[1]-1, 2])#-1 comes from the fact that there is forward linear interpolation which ommits the last data point
 for i in range (np.shape (processedFEMData2s)[0]):
        for j in range (np.shape (processedFEMData2s)[1]): 
               processedFEMData2s [i][j][0] = femStrainData2s[i][j][0]
-              processedFEMData2s [i][j][1] = matrixMultiplication(j,i,femStrainData2s[i])
-              'processedFEMData2s [i][j][1]= float(matrixMultiplication(j,i,femStrainData2s[i])[0,0])'
+              processedFEMData2s [i][j][1]= float(matrixMultiplication(j,i,femStrainData2s[i])[0,0])
