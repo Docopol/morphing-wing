@@ -71,8 +71,8 @@ def addcamber(array: np.ndarray, translateState:bool = False) -> list:
     for i in points:
         x.append(i[0])
         y.append(i[1])
-    x = np.array(x)[:-1]
-    y = np.array(y)[:-1]
+    x = np.array(x)[3:]
+    y = np.array(y)[3:]
     if translateState:
         translate = y[0] - midpoint[1]
         y = y - translate
@@ -297,7 +297,7 @@ def regress(array: np.ndarray, translateState:bool = False) -> np.ndarray:
     # perform least squares for every subgrid in main global array
     # scanner which starts at the bottom left, and goes to the right (layer per layer)
     for j in range(int(size[1])-1,-1,-1):
-        for i in range(int(size[0])):
+        for i in range(int(size[0])-1,-1,-1):
             loc_array = array[i,j]
             if np.count_nonzero(loc_array == True):
                 ## some debugging code (DEBUG)
@@ -315,28 +315,23 @@ def regress(array: np.ndarray, translateState:bool = False) -> np.ndarray:
                 centroidX.append(res[3])
                 centroidY.append(res[4])
 
-    # convert centroid list to arrays
     centroidX = np.array(centroidX)
     centroidY = np.array(centroidY)
 
-    # find contour tip x location
-    xtiploc = int(np.where(centroidX == np.max(centroidX))[0])
+    xtiploc = int(np.where(centroidX == np.min(centroidX))[0])
 
-    # Split contour into x and y and top and bottom
-    lower_surfaceX = centroidX[0: xtiploc]
-    upper_surfaceX = centroidX[xtiploc:]
+    lower_surfaceX = centroidX[xtiploc:]
+    upper_surfaceX = centroidX[0: xtiploc]
 
-    lower_surfaceY = centroidY[0: xtiploc]
-    upper_surfaceY = centroidY[xtiploc:]
+    lower_surfaceY = centroidY[xtiploc:]
+    upper_surfaceY = centroidY[0: xtiploc]
 
-    # sort the contour centroid values for correct plotting
     bubble = True
 
     while bubble:
         bubble = False
         for i in range(len(upper_surfaceX) - 1):
             if upper_surfaceX[i + 1] > upper_surfaceX[i]:
-
                 temp_file = upper_surfaceX[i + 1]
                 upper_surfaceX[i + 1] = upper_surfaceX[i]
                 upper_surfaceX[i] = temp_file
@@ -347,8 +342,8 @@ def regress(array: np.ndarray, translateState:bool = False) -> np.ndarray:
 
                 bubble = True
 
-    centroidX = np.concatenate([lower_surfaceX, upper_surfaceX])
-    centroidY = np.concatenate([lower_surfaceY, upper_surfaceY])
+    centroidX = np.concatenate([upper_surfaceX, lower_surfaceX])
+    centroidY = np.concatenate([upper_surfaceY, lower_surfaceY])
 
     if translateState:
         centroidY = centroidY - translate_target
@@ -377,10 +372,10 @@ class DeflectionProfiles:
         self.camberline = camberline
         self.cX = centroid[0,:]
         self.cY = centroid[1,:]
-        self.tipX = np.max(self.cX)
+        self.tipX = np.min(self.cX)
         self.tipY = float(self.cY[np.where(self.cX == self.tipX)])
-        self.rootY1 = np.min(self.cY[1])
-        self.rootY2 = np.max(self.cY[-1])
+        self.rootY1 = self.cY[0]
+        self.rootY2 = np.min(self.cY)
         self.rootX1 = float(self.cX[np.where(self.cY == self.rootY1)])
         self.rootX2 = float(self.cX[np.where(self.cY == self.rootY2)])
         self.rootmidpointX = np.abs(self.rootX2 + self.rootX1)/2
@@ -431,7 +426,7 @@ img_bool_cropped_camber, img_bool_cropped = cropimage(np.array(np.asarray(img_bo
 # imageVisualization(img_bool_cropped)
 # imageVisualization(img_bool_cropped_camber)
 
-img_bool_cropped_camber, img_bool_cropped = rotate(img_bool_cropped_camber,2), rotate(img_bool_cropped,2)
+img_bool_cropped_camber, img_bool_cropped = rotate(img_bool_cropped_camber,0), rotate(img_bool_cropped,0)
 
 camber_ = addcamber(img_bool_cropped_camber)[0]
 #plotBool(rotate(img_bool_cropped,3))
@@ -454,12 +449,12 @@ img_bool_file_target2 = load_file(img_bool_loc[9], separator=",", skip_last=True
 
 img_bool_cropped_camber_target, img_bool_cropped_target = cropimage(np.array(np.asarray(img_bool_file_target2), dtype=bool), np.array(np.asarray(img_bool_file_target1), dtype=bool))
 
-img_bool_cropped_camber_target, img_bool_cropped_target = rotate(img_bool_cropped_camber_target,2), rotate(img_bool_cropped_target,2)
+img_bool_cropped_camber_target, img_bool_cropped_target = rotate(img_bool_cropped_camber_target,0), rotate(img_bool_cropped_target,0)
 
 
-camber_target_, translate_target = addcamber(img_bool_cropped_camber_target, True)
+camber_target_, translate_target = addcamber(img_bool_cropped_camber_target, False)
 img_grid_target = creategrid(img_bool_cropped_target)
-centroid_target_ = regress(img_grid_target, True)
+centroid_target_ = regress(img_grid_target, False)
 
 dft = DeflectionProfiles(camber_target_, centroid_target_)
 # print(dft.__dict__)
