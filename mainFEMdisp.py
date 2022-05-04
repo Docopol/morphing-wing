@@ -77,21 +77,57 @@ loadstep5_disp_loc = nodeLocation(loadstep5_disp_nodes)
 #print(sum(loadstep5_disp_nodes))
 
 
-'''Below plots the leading edge shapes for 5 loadsteps'''
+'''Below plots the leading edge shapes for 5 loadsteps for mm'''
 
-plt.plot(loadstep1_disp[:, 1] + loadstep1_disp[:, 4], loadstep1_disp[:, 2] + loadstep1_disp[:, 5],
+#plt.plot(loadstep1_disp[:, 1] + loadstep1_disp[:, 4], loadstep1_disp[:, 2] + loadstep1_disp[:, 5],
+#            label="Loadstep 1")
+#plt.plot(loadstep2_disp[:, 1] + loadstep2_disp[:, 4], loadstep2_disp[:, 2] + loadstep2_disp[:, 5],
+#            label="Loadstep 2")
+#plt.plot(loadstep3_disp[:, 1] + loadstep3_disp[:, 4], loadstep3_disp[:, 2] + loadstep3_disp[:, 5],
+#            label="Loadstep 3")
+#plt.plot(loadstep4_disp[:, 1] + loadstep4_disp[:, 4], loadstep4_disp[:, 2] + loadstep4_disp[:, 5],
+#            label="Loadstep 4")
+#plt.plot(loadstep5_disp[:, 1] + loadstep5_disp[:, 4], loadstep5_disp[:, 2] + loadstep5_disp[:, 5],
+#            label="Loadstep 5")
+
+#plt.legend()
+#plt.show()
+
+loadstep1_coord_x = (loadstep1_disp[:, 1] + loadstep1_disp[:, 4])*1000 #output converted to mm
+loadstep1_coord_y = (loadstep1_disp[:, 2] + loadstep1_disp[:, 5])*1000 + 134.28528#shifted up so that leading edge lower side starts at y=0
+loadstep2_coord_x = (loadstep2_disp[:, 1] + loadstep2_disp[:, 4])*1000
+loadstep2_coord_y = (loadstep2_disp[:, 2] + loadstep2_disp[:, 5])*1000+ 134.28528
+loadstep3_coord_x = (loadstep3_disp[:, 1] + loadstep3_disp[:, 4])*1000
+loadstep3_coord_y = (loadstep3_disp[:, 2] + loadstep3_disp[:, 5])*1000+ 134.28528
+loadstep4_coord_x = (loadstep4_disp[:, 1] + loadstep4_disp[:, 4])*1000
+loadstep4_coord_y = (loadstep4_disp[:, 2] + loadstep4_disp[:, 5])*1000+ 134.28528
+loadstep5_coord_x = (loadstep5_disp[:, 1] + loadstep5_disp[:, 4])*1000
+loadstep5_coord_y = (loadstep5_disp[:, 2] + loadstep5_disp[:, 5])*1000+ 134.28528
+
+plt.xlabel("Position in X direction")
+plt.ylabel("Position in Y direction")
+#plt.plot(loadstep2_disp[:, 1] + loadstep2_disp[:, 4], loadstep2_disp[:, 2] + loadstep2_disp[:, 5],
+#            label="Loadstep 2")
+#plt.plot(loadstep3_disp[:, 1] + loadstep3_disp[:, 4], loadstep3_disp[:, 2] + loadstep3_disp[:, 5],
+#            label="Loadstep 3")
+#plt.plot(loadstep4_disp[:, 1] + loadstep4_disp[:, 4], loadstep4_disp[:, 2] + loadstep4_disp[:, 5],
+#            label="Loadstep 4")
+#plt.plot(loadstep5_disp[:, 1] + loadstep5_disp[:, 4], loadstep5_disp[:, 2] + loadstep5_disp[:, 5],
+#            label="Loadstep 5")
+
+'''
+plt.plot(loadstep1_coord_x,loadstep1_coord_y,
             label="Loadstep 1")
-plt.plot(loadstep2_disp[:, 1] + loadstep2_disp[:, 4], loadstep2_disp[:, 2] + loadstep2_disp[:, 5],
+plt.plot(loadstep2_coord_x,loadstep2_coord_y,
             label="Loadstep 2")
-plt.plot(loadstep3_disp[:, 1] + loadstep3_disp[:, 4], loadstep3_disp[:, 2] + loadstep3_disp[:, 5],
+plt.plot(loadstep3_coord_x,loadstep3_coord_y,
             label="Loadstep 3")
-plt.plot(loadstep4_disp[:, 1] + loadstep4_disp[:, 4], loadstep4_disp[:, 2] + loadstep4_disp[:, 5],
+plt.plot(loadstep4_coord_x,loadstep4_coord_y,
             label="Loadstep 4")
-plt.plot(loadstep5_disp[:, 1] + loadstep5_disp[:, 4], loadstep5_disp[:, 2] + loadstep5_disp[:, 5],
+plt.plot(loadstep5_coord_x,loadstep5_coord_y,
             label="Loadstep 5")
 
-
+plt.plot()
 plt.legend()
 plt.show()
-
-
+'''
