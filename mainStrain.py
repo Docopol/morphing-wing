@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import main
 import matplotlib.pyplot as plt
-import processingFEMData
+import processingFEMData_manualMatrix as processingFEMData
 import mainFEMdisp
 import sectionDivisionExpData
 
@@ -41,7 +41,7 @@ uncalibrated plots
 '''
 for i in range (5):
     fig, ax = plt.subplots(2,2)
-    title = str('Loadstep ' + str (i+1))
+    title = str('Uncalibrated Loadstep ' + str (i+1))
     fig.suptitle (title)
     
     #inside comparison plots experiment vs fem
@@ -85,7 +85,6 @@ for i in range (5):
     ax[1,1].set_ylabel('Difference in Microstrain between Inside and Outside [μm/m]')
     ax[1,1].set_xlabel('Length along contour [m]')
     ax[1,1].legend()
-    
 
 #asymmetry over time
 #plt.plot (label = 'Loop A-C', color = 'lime', ls = '-.') )

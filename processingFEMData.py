@@ -39,7 +39,7 @@ def angleDefinitionQuadraticSpline(loadstepNumber:int, rowNumber:int, femStrainD
        if abs(theta) > np.pi:
               theta = theta/abs(theta) * (abs(theta)-np.pi)
 
-       return angleStrainRadians
+       return angleAirfoilSurfaceRadians
 
 def matrixMultiplication (rownumber:int, loadstepNumber:int, femStrainDataSetForLoadsteps:np.ndarray): #include the loadstep specification in the femstraindatasetforloadstep
        '''
@@ -60,10 +60,6 @@ def matrixMultiplication (rownumber:int, loadstepNumber:int, femStrainDataSetFor
        return transformationMatrixs
 
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 #StrainData1s
 processedFEMData1s = np.zeros ([np.shape (femStrainData1s)[0], np.shape (femStrainData1s)[1]-1, 2])#-1 comes from the fact that there is forward linear interpolation which ommits the last data point
 for i in range (np.shape (processedFEMData1s)[0]):

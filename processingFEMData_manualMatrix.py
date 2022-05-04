@@ -19,10 +19,11 @@ e.g. strainData1s [2][:,2] -> gives the y strain data from data set 1 for the 3r
 '''
 posNodes = np.array([mainFEMdisp.loadstep1_disp, mainFEMdisp.loadstep2_disp, mainFEMdisp.loadstep3_disp, mainFEMdisp.loadstep4_disp, mainFEMdisp.loadstep5_disp])
 
+
 def angleDefinition(loadstepNumber:int, rowNumber:int, femStrainDataSetForLoadsteps:np.ndarray): #rownumber has to be 1 less than the amount of data points since no forward extrapolation can occur
-       x0,y0 = posNodes[loadstepNumber][rowNumber-1,1],posNodes[loadstepNumber][rowNumber-1,2]
-       x1,y1 = posNodes[loadstepNumber][rowNumber,1], posNodes[loadstepNumber][rowNumber,2]
-       x2,y2 = posNodes[loadstepNumber][rowNumber+1,1], posNodes[loadstepNumber][rowNumber+1,2]
+       y0,x0 = posNodes[loadstepNumber][rowNumber-1,1],posNodes[loadstepNumber][rowNumber-1,2]
+       y1,x1 = posNodes[loadstepNumber][rowNumber,1], posNodes[loadstepNumber][rowNumber,2]
+       y2,x2 = posNodes[loadstepNumber][rowNumber+1,1], posNodes[loadstepNumber][rowNumber+1,2]
 
        LHS = [[1,x0,x0**2],[1,x1,x1**2],[1,x2,x2**2]]
        RHS = [y0,y1,y2]
@@ -30,12 +31,16 @@ def angleDefinition(loadstepNumber:int, rowNumber:int, femStrainDataSetForLoadst
        c,b,a = np.linalg.solve(LHS,RHS)
        angleAirfoilSurfaceRadians = np.arctan(2*a*x1+b)
 
-       strainXX = femStrainDataSetForLoadsteps [rowNumber][1]
-       strainYY = femStrainDataSetForLoadsteps [rowNumber][2]
-       angleStrainRadians = np.arctan(strainYY/strainXX)
+       strainXX = femStrainDataSetForLoadsteps [rowNumber][2]
+       strainYY = femStrainDataSetForLoadsteps [rowNumber][1]
+       angleStrainRadians = np.arctan2(strainYY,strainXX)
 
-       theta = np.abs(angleAirfoilSurfaceRadians - angleStrainRadians)
-       return theta
+       theta = angleAirfoilSurfaceRadians - angleStrainRadians
+
+       if abs(theta) > np.pi:
+              theta = theta/abs(theta) * (abs(theta)-np.pi)
+
+       return angleAirfoilSurfaceRadians
 
 def matrixMultiplication (rownumber:int, loadstepNumber:int, femStrainDataSetForLoadsteps:np.ndarray): #include the loadstep specification in the femstraindatasetforloadstep
        '''
