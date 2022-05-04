@@ -115,7 +115,7 @@ plt.ylabel("Position in Y direction")
 #plt.plot(loadstep5_disp[:, 1] + loadstep5_disp[:, 4], loadstep5_disp[:, 2] + loadstep5_disp[:, 5],
 #            label="Loadstep 5")
 
-'''
+
 plt.plot(loadstep1_coord_x,loadstep1_coord_y,
             label="Loadstep 1")
 plt.plot(loadstep2_coord_x,loadstep2_coord_y,
@@ -130,4 +130,3 @@ plt.plot(loadstep5_coord_x,loadstep5_coord_y,
 plt.plot()
 plt.legend()
 plt.show()
-'''
