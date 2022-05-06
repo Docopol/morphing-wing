@@ -379,6 +379,25 @@ def regress(array: np.ndarray, translateState:bool = False) -> np.ndarray:
     return centroid
 
 
+class Deflectionfem():
+    """
+    Deflection angle using rootmidpoint and tip point
+    """
+    def __init__(self, femx: np.ndarray, femy: np.ndarray) -> None:
+        """
+        :param femx: x_coordinates of the fem contour (np.array)
+        :param femy: y_coordinates of the fem contour (np.array)
+        """
+        self.femx = femx
+        self.femy = femy
+        self.x = np.max(self.femx)
+        try:
+            self.y = abs(self.femy[np.where(self.femx == self.x)][1])
+        except IndexError:
+            self.y = abs(self.femy[np.where(self.femx == self.x)])
+        self.angle = math.atan2(self.y, self.x) * 180 / math.pi
+
+
 @perftimer
 class DeflectionProfiles:
     """
@@ -537,5 +556,21 @@ plt.show()
 
 plt.plot(loadstep1_coord_x, loadstep1_coord_y)
 plt.plot(loadstep5_coord_x, loadstep5_coord_y)
+plt.plot(coordinates_skin[0], coordinates_skin[1])
 plt.grid()
 plt.show()
+
+
+fem_l1 = Deflectionfem(loadstep1_coord_x, loadstep1_coord_y)
+fem_l5 = Deflectionfem(loadstep5_coord_x, loadstep5_coord_y)
+fem_target= Deflectionfem(coordinates_skin[0], coordinates_skin[1])
+
+print(f"---------- Deflection angles - final ----------\n"
+      f"experimental:\n"
+      f"model1: {dft.dangle1 - df1.dangle1:.5f} degrees\n"
+      f"model2: {dft.dangle2 - df1.dangle2:.5f} degrees\n"
+      f"fem:\n"
+      f"init: {fem_l1.angle:.5f} degrees\n"
+      f"final: {fem_l5.angle:.5f} degrees\n"
+      f"target: {fem_target.angle:.5f} degrees\n"
+      f"-----------------------------------------------")
