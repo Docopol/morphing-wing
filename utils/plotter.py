@@ -36,7 +36,7 @@ class Plotter:
             if len(i) != len(j):
                 raise Exception(f"Can't create graph, with irregular points ({len(i)}x{len(j)})")
             if k:
-                plt.plot(i, j, label=self.legend)
+                plt.plot(i, j, label=k)
             else:
                 plt.plot(i, j)
         plt.ylabel(self.y_label)

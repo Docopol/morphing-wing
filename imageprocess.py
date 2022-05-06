@@ -524,10 +524,6 @@ plt.ylabel("Position in Y direction [mm]")
 plt.legend(bbox_to_anchor = (0.57,0.83))
 plt.show()
 
-print(f"---------- Deflection angles - final ----------\n"
-      f"model1: {dft.dangle1 - df1.dangle1:.5f} degrees\n"
-      f"model2: {dft.dangle2 - df1.dangle2:.5f} degrees")
-
 ############################
 
 loadstep1_coord_x = (loadstep1_disp[:, 1] + loadstep1_disp[:, 4])*1000
@@ -563,7 +559,7 @@ plt.show()
 
 fem_l1 = Deflectionfem(loadstep1_coord_x, loadstep1_coord_y)
 fem_l5 = Deflectionfem(loadstep5_coord_x, loadstep5_coord_y)
-fem_target= Deflectionfem(coordinates_skin[0], coordinates_skin[1])
+fem_target = Deflectionfem(coordinates_skin[0], coordinates_skin[1])
 
 print(f"---------- Deflection angles - final ----------\n"
       f"experimental:\n"
