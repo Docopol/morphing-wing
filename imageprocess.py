@@ -488,9 +488,9 @@ target_contour = ((centroid_target_[0] - midpoint[0]) / scale, (centroid_target_
 camber = ((camber_[0] - midpoint[0]) / scale, (camber_[1] - midpoint[1]) / scale)
 target_camber = ((camber_target_[0] - midpoint[0]) / scale, (camber_target_[1] - midpoint[1]) / scale)
 
-red_patch = mpatches.Patch(color='orange', label='Target shape')
-blue_patch = mpatches.Patch(color='blue', label='Initial pos')
-plt.legend(handles=[red_patch, blue_patch])
+#red_patch = mpatches.Patch(color='orange', label='Target shape')
+#blue_patch = mpatches.Patch(color='blue', label='Initial pos')
+#plt.legend(handles=[red_patch, blue_patch])
 plt.grid()
 
 plt.plot(contour[0], contour[1])
@@ -498,6 +498,7 @@ plt.plot(target_contour[0], target_contour[1])
 plt.plot(camber[0], camber[1], color=colors[0])
 plt.plot(target_camber[0], target_camber[1], color=colors[0])
 plt.plot(coordinates_skin[0], coordinates_skin[1])
+plt.legend()
 plt.show()
 
 print(f"---------- Deflection angles - final ----------\n"
