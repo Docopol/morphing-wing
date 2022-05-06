@@ -497,7 +497,7 @@ plt.grid()
 
 plt.plot(contour[0], contour[1], label = 'Initial Experimental Contour')
 plt.plot(target_contour[0], target_contour[1], label = 'Final Experimental Contour')
-plt.plot(camber[0], camber[1], color=colors[1],linestyle='--', dashes=(2, 2), label = 'Initial Experimental Camberline')
+#plt.plot(camber[0], camber[1], color=colors[1],linestyle='--', dashes=(2, 2), label = 'Initial Experimental Camberline')
 
 plt.plot(target_camber[0], target_camber[1], color=colors[0], label = 'Final Experimental Camberline')
 plt.plot(coordinates_skin[0], coordinates_skin[1], label = 'Target FEM Final')
@@ -506,9 +506,6 @@ plt.ylabel("Position in Y direction [mm]")
 plt.legend(bbox_to_anchor = (0.57,0.83))
 plt.show()
 
-
-
-
 print(f"---------- Deflection angles - final ----------\n"
       f"model1: {dft.dangle1 - df1.dangle1:.5f} degrees\n"
       f"model2: {dft.dangle2 - df1.dangle2:.5f} degrees")
@@ -516,7 +513,25 @@ print(f"---------- Deflection angles - final ----------\n"
 ############################
 
 loadstep1_coord_x = (loadstep1_disp[:, 1] + loadstep1_disp[:, 4])*1000
-loadstep1_coord_y = (loadstep1_disp[:, 2] + loadstep1_disp[:, 5])*1000 + 134.28528
-loadstep5_coord_x = (loadstep5_disp[:, 1] + loadstep5_disp[:, 4])*1000 + 17.5
-loadstep5_coord_y = (loadstep5_disp[:, 2] + loadstep5_disp[:, 5])*1000 + 134.28528
+loadstep1_coord_y = (loadstep1_disp[:, 2] + loadstep1_disp[:, 5])*1000
+loadstep5_coord_x = (loadstep5_disp[:, 1] + loadstep5_disp[:, 4])*1000
+loadstep5_coord_y = (loadstep5_disp[:, 2] + loadstep5_disp[:, 5])*1000
 
+loadstep1_coord_x = -1 * loadstep1_coord_x + np.max(loadstep1_coord_x)
+loadstep5_coord_x = -1 * loadstep5_coord_x + np.max(loadstep5_coord_x)
+
+loadstep1_coord_y -= abs(loadstep1_coord_y[0] + loadstep1_coord_y[-1])/2
+loadstep5_coord_y -= abs(loadstep5_coord_y[0] + loadstep5_coord_y[-1])/2
+
+plt.plot(contour[0], contour[1])
+plt.plot(camber[0], camber[1], color=colors[0])
+plt.plot(loadstep1_coord_x, loadstep1_coord_y)
+plt.grid()
+plt.show()
+
+plt.plot(target_contour[0], target_contour[1])
+plt.plot(target_camber[0], target_camber[1], color=colors[0])
+plt.plot(loadstep5_coord_x, loadstep5_coord_y)
+plt.plot(coordinates_skin[0], coordinates_skin[1])
+plt.grid()
+plt.show()
