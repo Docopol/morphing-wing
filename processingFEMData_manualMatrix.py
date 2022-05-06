@@ -5,7 +5,7 @@ import mainFEMdisp
 from matrixManual import matrixManual
 
 '''
-femStrainData1s and femStrainData2s are numpy arrays with [loadstepnumber - 1] [nodenumber - 11651, data column (node number, x, y, z, xy, yz, zx)]
+femStrainData1s and femStrainData2s are numpy arrays with [loadstepnumber - 1] [nodenumber - 11651 data column (node number, x, y, z, xy, yz, zx)]
 e.g. strainData1s [2][:,2] -> gives the y strain data from data set 1 for the 3rd loadstep 
 - Ask Mick if confused
 '''
@@ -76,3 +76,6 @@ for i in range (np.shape (processedFEMData2s)[0]):
               processedFEMData2s [i][j][0] = femStrainData2s[i][j][0]
               processedFEMData2s [i][j][1] = matrixMultiplication(j,i,femStrainData2s[i])
               'processedFEMData2s [i][j][1]= float(matrixMultiplication(j,i,femStrainData2s[i])[0,0])'
+              
+print(femStrainData1s[3][:][3][1])
+
