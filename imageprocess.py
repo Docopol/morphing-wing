@@ -483,6 +483,8 @@ dft = DeflectionProfiles(camber_target_, centroid_target_)
 
 ###### Plotting ######
 
+scale = (abs(df1.rootY1 - df1.rootY2)) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1]))
+
 contour = ((centroid_[0] - midpoint[0]) / scale, (centroid_[1] - midpoint[1]) / scale)
 target_contour = ((centroid_target_[0] - midpoint[0]) / scale, (centroid_target_[1] - midpoint[1]) / scale)
 camber = ((camber_[0] - midpoint[0]) / scale, (camber_[1] - midpoint[1]) / scale)
