@@ -8,6 +8,9 @@ import math
 from PIL import Image
 from scipy.misc import derivative
 
+from optimalshapeplot import coordinates_skin
+from mainFEMdisp import loadstep1_disp, loadstep5_disp
+
 from utils.other import perftimer
 from utils.filereader import files_in_directory
 from utils.filereader import load_file
@@ -19,6 +22,7 @@ cut_right = 0
 cut_up = 0
 cut_down = 0
 subgrid_size = 25
+scale = 6.075
 
 # Styling variables
 colors = ["k", "b"]
@@ -71,16 +75,17 @@ def addcamber(array: np.ndarray, translateState:bool = False) -> list:
     for i in points:
         x.append(i[0])
         y.append(i[1])
-    x = np.array(x)[:-1]
-    y = np.array(y)[:-1]
+    x = np.array(x)
+    y = np.array(y)
+
     if translateState:
         translate = y[0] - midpoint[1]
         y = y - translate
-    f = scp.interp1d(x, y, kind='cubic')
-    #plt.plot(x, y, color=colors[0], linestyle='--', dashes=(5, 20), linewidth=1)
-    plt.plot(x, y, color=colors[0])
-    #plt.plot(x, f(x), color=colors[0])
-    return [[x,y], translate]
+    # f = scp.interp1d(x, y, kind='cubic')
+    # plt.plot(x, y, color=colors[0], linestyle='--', dashes=(5, 20), linewidth=1)
+    # plt.plot(x, y, color=colors[0])
+    # plt.plot(x, f(x), color=colors[0])
+    return [np.array([x, y]), translate]
 
 
 # Outdated function used for debugging
@@ -347,6 +352,22 @@ def regress(array: np.ndarray, translateState:bool = False) -> np.ndarray:
 
                 bubble = True
 
+    bubble = True
+
+    while bubble:
+        bubble = False
+        for i in range(len(lower_surfaceX) - 1):
+            if lower_surfaceX[i + 1] < lower_surfaceX[i]:
+                temp_file = lower_surfaceX[i + 1]
+                lower_surfaceX[i + 1] = lower_surfaceX[i]
+                lower_surfaceX[i] = temp_file
+
+                temp_file_1 = lower_surfaceY[i + 1]
+                lower_surfaceY[i + 1] = lower_surfaceY[i]
+                lower_surfaceY[i] = temp_file_1
+
+                bubble = True
+
     centroidX = np.concatenate([lower_surfaceX, upper_surfaceX])
     centroidY = np.concatenate([lower_surfaceY, upper_surfaceY])
 
@@ -354,7 +375,7 @@ def regress(array: np.ndarray, translateState:bool = False) -> np.ndarray:
         centroidY = centroidY - translate_target
 
     centroid = np.vstack((centroidX, centroidY))
-    plt.plot(centroid[0], centroid[1])
+    # plt.plot(centroid[0], centroid[1])
     return centroid
 
 
@@ -379,7 +400,7 @@ class DeflectionProfiles:
         self.cY = centroid[1,:]
         self.tipX = np.max(self.cX)
         self.tipY = float(self.cY[np.where(self.cX == self.tipX)])
-        self.rootY1 = np.min(self.cY[1])
+        self.rootY1 = np.min(self.cY[0])
         self.rootY2 = np.max(self.cY[-1])
         self.rootX1 = float(self.cX[np.where(self.cY == self.rootY1)])
         self.rootX2 = float(self.cX[np.where(self.cY == self.rootY2)])
@@ -397,10 +418,10 @@ class DeflectionProfiles:
         """
         self.dangle1 = math.atan2(abs(self.rootmidpointY-self.tipY),
                                   abs(self.rootmidpointX-self.tipX)) * 180 / math.pi
-        plt.plot(self.rootX1, self.rootY1, "ro")
-        plt.plot(self.rootX2, self.rootY2, "ko")
-        plt.plot(self.rootmidpointX, self.rootmidpointY, "ro")
-        plt.plot(self.tipX, self.tipY, "ro")
+        # plt.plot(self.rootX1, self.rootY1, "ro")
+        # plt.plot(self.rootX2, self.rootY2, "ko")
+        # plt.plot(self.rootmidpointX, self.rootmidpointY, "ro")
+        # plt.plot(self.tipX, self.tipY, "ro")
 
     def model2(self):
         """
@@ -408,6 +429,8 @@ class DeflectionProfiles:
         """
         self.dangle2 = math.atan2(abs(self.camberline[1][-1] - self.camberline[1][0]),
                                   abs(self.camberline[0][-1] - self.camberline[0][0])) * 180 / math.pi
+        # plt.plot(self.camberline[0][-1], self.camberline[1][-1], "ko")
+        # plt.plot(self.camberline[0][0], self.camberline[1][0], "ko")
 
     def printsummary(self):
         """
@@ -438,12 +461,6 @@ camber_ = addcamber(img_bool_cropped_camber)[0]
 img_grid = creategrid(img_bool_cropped)
 centroid_ = regress(img_grid)
 
-
-red_patch = mpatches.Patch(color='orange', label='Target shape')
-blue_patch = mpatches.Patch(color='blue', label='Initial pos')
-plt.legend(handles=[red_patch, blue_patch])
-plt.grid()
-
 df1 = DeflectionProfiles(camber_, centroid_)
 midpoint = (df1.camberline[0][0], df1.camberline[1][0])
 # print(df1.__dict__)
@@ -464,14 +481,33 @@ centroid_target_ = regress(img_grid_target, True)
 dft = DeflectionProfiles(camber_target_, centroid_target_)
 # print(dft.__dict__)
 
+###### Plotting ######
+
+contour = ((centroid_[0] - midpoint[0]) / scale, (centroid_[1] - midpoint[1]) / scale)
+target_contour = ((centroid_target_[0] - midpoint[0]) / scale, (centroid_target_[1] - midpoint[1]) / scale)
+camber = ((camber_[0] - midpoint[0]) / scale, (camber_[1] - midpoint[1]) / scale)
+target_camber = ((camber_target_[0] - midpoint[0]) / scale, (camber_target_[1] - midpoint[1]) / scale)
+
+red_patch = mpatches.Patch(color='orange', label='Target shape')
+blue_patch = mpatches.Patch(color='blue', label='Initial pos')
+plt.legend(handles=[red_patch, blue_patch])
+plt.grid()
+
+plt.plot(contour[0], contour[1])
+plt.plot(target_contour[0], target_contour[1])
+plt.plot(camber[0], camber[1], color=colors[0])
+plt.plot(target_camber[0], target_camber[1], color=colors[0])
+plt.plot(coordinates_skin[0], coordinates_skin[1])
 plt.show()
 
 print(f"---------- Deflection angles - final ----------\n"
       f"model1: {dft.dangle1 - df1.dangle1:.5f} degrees\n"
       f"model2: {dft.dangle2 - df1.dangle2:.5f} degrees")
 
-# to do
-# add fem plots
-# styling of plots
-# choose to present camber or chord (for deflec)
-#
+############################
+
+loadstep1_coord_x = (loadstep1_disp[:, 1] + loadstep1_disp[:, 4])*1000
+loadstep1_coord_y = (loadstep1_disp[:, 2] + loadstep1_disp[:, 5])*1000 + 134.28528
+loadstep5_coord_x = (loadstep5_disp[:, 1] + loadstep5_disp[:, 4])*1000 + 17.5
+loadstep5_coord_y = (loadstep5_disp[:, 2] + loadstep5_disp[:, 5])*1000 + 134.28528
+
