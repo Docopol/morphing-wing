@@ -29,16 +29,16 @@ def angleDefinitionQuadraticSpline(loadstepNumber:int, rowNumber:int, femStrainD
        
        c,b,a = np.linalg.solve(LHS,RHS)
        angleAirfoilSurfaceRadians = np.arctan(2*a*x1+b)
-
+       '''
        strainXX = femStrainDataSetForLoadsteps [rowNumber][2]
        strainYY = femStrainDataSetForLoadsteps [rowNumber][1]
        angleStrainRadians = np.arctan2(strainYY,strainXX)
-
+       
        theta = angleAirfoilSurfaceRadians - angleStrainRadians
-
+       
        if abs(theta) > np.pi:
               theta = theta/abs(theta) * (abs(theta)-np.pi)
-
+       '''
        return angleAirfoilSurfaceRadians
 
 def matrixMultiplication (rownumber:int, loadstepNumber:int, femStrainDataSetForLoadsteps:np.ndarray): #include the loadstep specification in the femstraindatasetforloadstep
@@ -85,6 +85,5 @@ for i in range (np.shape (processedFEMData1s)[0]):
 
 print(thetaValues)
 
-plt.plot(thetaValues[1][:,0], np.cos(thetaValues[1][:,2]))
 plt.plot(thetaValues[1][:,0], thetaValues[1][:,2])
 plt.show()
