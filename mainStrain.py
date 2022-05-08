@@ -91,7 +91,7 @@ for i in range (5):
 #plt.plot (label = 'Loop B-D', color = 'cyan', ls = '--') )
 
 plt.legend()
-    
+
 plt.show()
 '''
 

@@ -1,7 +1,10 @@
 
+from cgitb import small
+from turtle import shape
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from twoStrainSplitter import check_interval, check_closest
 
 '''
 Takes the unprocessed panda dataframe of experimental data.
@@ -93,7 +96,7 @@ def fitSection(sectionLengths, callibrationStart, callibrationEnd):
     gapNumber = len(sectionLengths) - 1
     gapLength = totalLength/gapNumber
 
-    fittedLength = np.zeros(gapNumber+1)
+    fittedLength = np.empty([gapNumber+1])
     fittedLength[0]=callibrationStart
 
     for i in range(gapNumber):
@@ -104,7 +107,7 @@ def fitSection(sectionLengths, callibrationStart, callibrationEnd):
 
 def noiseRemove(timeZeroStrains, strainMeasures):
 
-    noNoiseStrains = np.zeros(len(timeZeroStrains))
+    noNoiseStrains = np.empty([len(timeZeroStrains)])
 
     for i in range(len(timeZeroStrains)):
         noNoiseStrains[i] = float(strainMeasures[i]) - timeZeroStrains[i]
@@ -121,7 +124,7 @@ This function happens since the callibration points given make the gaps not have
 
 def calibrateSection(secLengths, secCalibFibers, secCalibActual):
     a = 0
-    secLengthsActuals = np.zeros(1)
+    secLengthsActuals = np.empty([1])
 
     while a < len(secCalibActual)-1:
         #print(secCalibActual[a])
@@ -238,4 +241,145 @@ experimentalDatas = []
 
 for i in range(1,80):
     experimentalDatas.append(expData(i))
+
+'''print(np.size(experimentalDatas[1][0][1]))
+print(np.size(experimentalDatas[1][0][3]))
+
+plt.plot(experimentalDatas[1][0][1],experimentalDatas[1][1][1])
+plt.plot(experimentalDatas[1][0][3],experimentalDatas[1][1][3])
+plt.show()'''
+
+tested_step  = 12
+
+
+'''
+Checks the endpoints of the interval on which the strains (inside/outside) can be compared.
+    Inputs: strain_in, strain_out
+    Outputs: 
+     - interval_min: minimum value of arcsec lenght of interval
+     - interval_max: maximum idem.
+     - i_range[a][b]: list of cell numbers for a (0: inside(DC), 1: outside(AB) loops) and b (0: start, 1: end of interval)
+'''
+
+AC_min_extreme, AC_max_extreme, AC_indexes = check_interval(experimentalDatas[tested_step][0][2][1:], experimentalDatas[tested_step][0][0])
+
+BD_lens_flipped = np.empty([2], dtype='object')
+
+BD_lens_flipped[0] = np.flip(experimentalDatas[tested_step][0][3][1:])
+BD_lens_flipped[1] = np.flip(experimentalDatas[tested_step][0][1][1:])
+
+BD_min_extreme, BD_max_extreme, BD_indexes = check_interval(BD_lens_flipped[0], BD_lens_flipped[1])
+
+AC_indexes[0,0] = AC_indexes[0,0] + 1 # For some reason there's a zero in the first term which fucks things up, this fixes that.
+BD_indexes[0,0] = BD_indexes[0,0] + 1
+
+'''
+print(AC_min_extreme, ' to ', AC_max_extreme)
+print(AC_indexes)
+print(experimentalDatas[tested_step][0][2][AC_indexes[0,0]], experimentalDatas[tested_step][0][2][AC_indexes[0,1]])
+print(experimentalDatas[tested_step][0][0][AC_indexes[1,0]], experimentalDatas[tested_step][0][0][AC_indexes[1,1]])
+
+print()
+
+print(BD_min_extreme, ' to ', BD_max_extreme)
+print(BD_indexes)
+print(BD_lens_flipped[0][BD_indexes[0,0]], BD_lens_flipped[0][BD_indexes[0,1]])
+print(BD_lens_flipped[1][BD_indexes[1,0]], BD_lens_flipped[1][BD_indexes[1,1]])
+'''
+
+timeStamps = [0, 12, 27, 39, 54]
+
+def axial_str(inside_str, outside_str):
+    return (outside_str + inside_str)/2
+
+def bend_str(inside_str, outside_str):
+    return (outside_str - inside_str)/2
+
+
+# Timestamps here picked randomly since the lengths of the section wont change.
+AC_formula_lengths = experimentalDatas[0][0][2][AC_indexes[0,0]:AC_indexes[0,1]]
+BD_formula_lengths = np.flip(experimentalDatas[0][0][1])[BD_indexes[0,0]:BD_indexes[0,1]]
+
+print(BD_indexes)
+
+j = 0
+# Array of arrays. Index correspond to the five relevant timestamps. (0, 12, 27, 39, 54)
+ax_str_AC = np.empty([5], dtype='object') 
+bd_str_AC = np.empty([5], dtype='object')
+ax_str_BD = np.empty([5], dtype='object') 
+bd_str_BD = np.empty([5], dtype='object')
+
+for time in timeStamps:     #Calculates the axial and bending strains with the closest matching perimeter positions.
+    A_lens = experimentalDatas[0][0][0][AC_indexes[1,0]:AC_indexes[1,1]]
+    placeholder_axial = []
+    placeholder_bend = []
+    for i in range(AC_indexes[0,0], np.size(experimentalDatas[time][0][2][AC_indexes[0,0]:AC_indexes[0,1]])+1):    
+        A_index = check_closest(experimentalDatas[time][0][2][i], A_lens)
+        out_str = experimentalDatas[time][1][0][A_index]
+        in_str = experimentalDatas[time][1][2][i]
+
+        placeholder_axial = np.append(placeholder_axial, axial_str(in_str, out_str))
+        placeholder_bend = np.append(placeholder_bend, bend_str(in_str, out_str)) 
+    ax_str_AC[j] = placeholder_axial
+    bd_str_AC[j] = placeholder_bend
+
+    B_lens = np.flip(experimentalDatas[0][0][1])[BD_indexes[1,0]:BD_indexes[1,1]]
+    placeholder_axial = []
+    placeholder_bend = []
+    for i in range(BD_indexes[0,0], np.size(experimentalDatas[time][0][1][BD_indexes[0,0]:BD_indexes[0,1]])+1):    
+        B_index = check_closest(experimentalDatas[time][0][3][i], B_lens)
+        out_str = np.flip(experimentalDatas[time][1][1])[B_index]
+        in_str = np.flip(experimentalDatas[time][1][3])[i]
+
+        placeholder_axial = np.append(placeholder_axial, axial_str(in_str, out_str))
+        placeholder_bend = np.append(placeholder_bend, bend_str(in_str, out_str)) 
+    ax_str_BD[j] = placeholder_axial
+    bd_str_BD[j] = placeholder_bend
+
+    j = j + 1    
+        
+
+'''
+This section checks which parts of the fiber data have to be discarded due to the stiffeners.
+
+The lengths where this had to happen were, honestly, picked by hand. 
+Using the graphs of unaltered strain data, the stiffener locations are found around:
+    0.31 - 0.38 m
+    0.54 - 0.64 m
+    0.71 - 0.77 m
+The indexes below are the start and end indexes for the gaps.
+The gaps here refer to the four gaps in-between the discarded data.
+'''
+
+# JUST FOR AC
+
+gap_1 = [0, check_closest(0.31,AC_formula_lengths)]
+gap_2 = [check_closest(0.38, AC_formula_lengths), check_closest(0.54, AC_formula_lengths)]
+gap_3 = [check_closest(0.64, AC_formula_lengths), check_closest(0.71, AC_formula_lengths)]
+gap_4 = [check_closest(0.77, AC_formula_lengths), -1]
+
+gap_1_BD = [0, check_closest(0.31,BD_formula_lengths)]
+gap_2_BD = [check_closest(0.38, BD_formula_lengths), check_closest(0.54, BD_formula_lengths)]
+gap_3_BD = [check_closest(0.64, BD_formula_lengths), check_closest(0.71, BD_formula_lengths)]
+gap_4_BD = [check_closest(0.77, BD_formula_lengths), -1]
+
+'''print(gap_1_BD)
+print(gap_2_BD)'''
+
+
+'''
+print(gap_1, 'corresponding lengths:', AC_formula_lengths[gap_1[0]],AC_formula_lengths[gap_1[1]])
+print(gap_2, 'corresponding lengths:', AC_formula_lengths[gap_2[0]],AC_formula_lengths[gap_2[1]])
+print(gap_3, 'corresponding lengths:', AC_formula_lengths[gap_3[0]],AC_formula_lengths[gap_3[1]])
+print(gap_4, 'corresponding lengths:', AC_formula_lengths[gap_4[0]],AC_formula_lengths[gap_4[1]])
+'''
+
+'''plt.plot(BD_formula_lengths[gap_1_BD[0]:gap_1_BD[1]],ax_str_BD[1][gap_1_BD[0]:gap_1_BD[1]])
+plt.plot(BD_formula_lengths[gap_2_BD[0]:gap_2_BD[1]],ax_str_BD[1][gap_2_BD[0]:gap_2_BD[1]])
+plt.plot(BD_formula_lengths[gap_3_BD[0]:gap_3_BD[1]],ax_str_BD[1][gap_3_BD[0]:gap_3_BD[1]])
+plt.plot(BD_formula_lengths[gap_4_BD[0]:gap_4_BD[1]],ax_str_BD[1][gap_4_BD[0]:gap_4_BD[1]])
+
+
+plt.show()'''
+
 
