@@ -35,18 +35,13 @@ This spaghetti code is mine, I apologize in advance.
 
 The indexing is 0 for loop AC and 1 for loop BC, for all the stuff below.
 '''
-experimentDatas_axial = [sectionDivisionExpData.ax_str_AC, sectionDivisionExpData.ax_str_BD]
-experimentDatas_bend = [sectionDivisionExpData.bd_str_AC, sectionDivisionExpData.bd_str_BD]
-index_gaps = [[sectionDivisionExpData.gap_1, sectionDivisionExpData.gap_2, sectionDivisionExpData.gap_3, sectionDivisionExpData.gap_4],[sectionDivisionExpData.gap_1_BD, sectionDivisionExpData.gap_2_BD, sectionDivisionExpData.gap_3_BD, sectionDivisionExpData.gap_4_BD]]
 
-AC_formula_lengths = sectionDivisionExpData.AC_formula_lengths
-ax_str_AC = sectionDivisionExpData.ax_str_AC
+newExpDatas = sectionDivisionExpData.newExpDatas
 
-BD_formula_lengths = sectionDivisionExpData.BD_formula_lengths
-ax_str_BD = sectionDivisionExpData.ax_str_BD
-
-timeStamps = [0, 12, 27, 39, 54]
-plots = [221]
+AC_index = sectionDivisionExpData.AC_index
+AC_axial = sectionDivisionExpData.AC_axial
+BD_index = sectionDivisionExpData.BD_index
+BD_axial = sectionDivisionExpData.BD_axial
 
 
 '''
@@ -56,21 +51,14 @@ v v make graphs v v
 '''
 Axial Strain
 '''
-index_gaps[0][1]
+
 for i in range (1,5):
     plt.figure(i)
     #inside comparison plots experiment vs fem
     #plt.title('Loadstep vs FEM strains')
     #plt.plot(#experiment x values, #experiment y values, label = 'Experimental Loop C', color = 'lime', ls = '-.')
-    plt.plot(AC_formula_lengths[index_gaps[0][0][0]:index_gaps[0][0][1]],[ -x for x in ax_str_AC[i-1][index_gaps[0][0][0]:index_gaps[0][0][1]]], label = 'Experimental Loop AC',  color = 'b', ls = '-.')
-    plt.plot(AC_formula_lengths[index_gaps[0][1][0]:index_gaps[0][1][1]],[ -x for x in ax_str_AC[i-1][index_gaps[0][1][0]:index_gaps[0][1][1]]], color = 'b', ls = '-.')
-    plt.plot(AC_formula_lengths[index_gaps[0][2][0]:index_gaps[0][2][1]],[ -x for x in ax_str_AC[i-1][index_gaps[0][2][0]:index_gaps[0][2][1]]], color = 'b', ls = '-.')
-    plt.plot(AC_formula_lengths[index_gaps[0][3][0]:index_gaps[0][3][1]],[ -x for x in ax_str_AC[i-1][index_gaps[0][3][0]:index_gaps[0][3][1]]], color = 'b', ls = '-.')
-    
-    plt.plot(np.flip(BD_formula_lengths[index_gaps[1][0][0]:index_gaps[1][0][1]]),[ -x for x in ax_str_BD[i-1][index_gaps[1][0][0]:index_gaps[1][0][1]]], label = 'Experimental Loop BD',  color = 'g', ls = '-.')
-    plt.plot(np.flip(BD_formula_lengths[index_gaps[1][1][0]:index_gaps[1][1][1]]),[ -x for x in ax_str_BD[i-1][index_gaps[1][1][0]:index_gaps[1][1][1]]], color = 'g', ls = '-.')
-    plt.plot(np.flip(BD_formula_lengths[index_gaps[1][2][0]:index_gaps[1][2][1]]),[ -x for x in ax_str_BD[i-1][index_gaps[1][2][0]:index_gaps[1][2][1]]], color = 'g', ls = '-.')
-    plt.plot(np.flip(BD_formula_lengths[index_gaps[1][3][0]:index_gaps[1][3][1]]),[ -x for x in ax_str_BD[i-1][index_gaps[1][3][0]:index_gaps[1][3][1]]], color = 'g', ls = '-.')
+    plt.plot(newExpDatas[0][0][2][AC_index[0][0]:AC_index[0][1]], AC_axial[i], ls = '--', label='AC Axial', color = 'r')
+    plt.plot(newExpDatas[0][0][3][BD_index[0][0]:BD_index[0][1]], BD_axial[i], label = 'BD Axial', color = 'b')
     
     plt.plot(np.flip(femNodeLocations[i]), FEMdatas[i][:,1] * 10 ** 6, label = 'FEM', color = 'hotpink')
     
