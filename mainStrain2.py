@@ -55,7 +55,7 @@ Axial Strain
 for i in range (1,5):
     plt.figure(i)
     #inside comparison plots experiment vs fem
-    #plt.title('Loadstep vs FEM strains')
+    plt.title('Loadstep ' + str(i+1) + ' Experimental vs FEM strains')
     #plt.plot(#experiment x values, #experiment y values, label = 'Experimental Loop C', color = 'lime', ls = '-.')
     plt.plot(newExpDatas[0][0][2][AC_index[0][0]:AC_index[0][1]], AC_axial[i], ls = '--', label='AC Axial', color = 'r')
     plt.plot(newExpDatas[0][0][3][BD_index[0][0]:BD_index[0][1]], BD_axial[i], label = 'BD Axial', color = 'b')
