@@ -40,8 +40,10 @@ newExpDatas = sectionDivisionExpData.newExpDatas
 
 AC_index = sectionDivisionExpData.AC_index
 AC_axial = sectionDivisionExpData.AC_axial
+AC_bending = sectionDivisionExpData.AC_bending
 BD_index = sectionDivisionExpData.BD_index
 BD_axial = sectionDivisionExpData.BD_axial
+BD_bending = sectionDivisionExpData.BD_bending
 
 
 '''
@@ -58,7 +60,7 @@ for i in range (1,5):
     plt.title('Loadstep ' + str(i+1) + ' Experimental vs FEM strains')
     #plt.plot(#experiment x values, #experiment y values, label = 'Experimental Loop C', color = 'lime', ls = '-.')
     plt.plot(newExpDatas[0][0][2][AC_index[0][0]:AC_index[0][1]], AC_axial[i], ls = '--', label='AC Axial', color = 'r')
-    plt.plot(newExpDatas[0][0][3][BD_index[0][0]:BD_index[0][1]], BD_axial[i], label = 'BD Axial', color = 'b')
+    plt.plot(newExpDatas[0][0][3][BD_index[0][0]:BD_index[0][1]], BD_axial[i], ls = '--', label = 'BD Axial', color = 'b')
     
     plt.plot(np.flip(femNodeLocations[i]), FEMdatas[i][:,1] * 10 ** 6, label = 'FEM', color = 'hotpink')
     
@@ -77,6 +79,9 @@ for i in range (1,5):
     #inside comparison plots experiment vs fem
     #plt.title('Loadstep vs FEM strains')
     #plt.plot(#experiment x values, #experiment y values, label = 'Experimental Loop C', color = 'lime', ls = '-.')
+
+    plt.plot(newExpDatas[0][0][2][AC_index[0][0]:AC_index[0][1]], AC_bending[i], ls = '--', label='AC Bending', color = 'r')
+    plt.plot(newExpDatas[0][0][3][BD_index[0][0]:BD_index[0][1]], BD_bending[i], ls = '--',label = 'BD Bending', color = 'b')
     
     plt.plot(np.flip(femNodeLocations[i]), FEMdatas[i][:,2] * 10 ** 6, label = 'FEM', color = 'hotpink')
     
