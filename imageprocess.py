@@ -32,7 +32,8 @@ def imageVisualization(file, show_colorbar:bool = False, name:str = "") -> None:
     """
     visualization an image using plt.imshow()
     """
-    plt.imshow(file)
+    plt.imshow(file, cmap="binary")
+    plt.axis('off')
     if show_colorbar:
         plt.colorbar()
     plt.show()
@@ -470,7 +471,7 @@ img_bool_file1 = load_file(img_bool_loc[0], separator=",", skip_last=True)
 img_bool_file2 = load_file(img_bool_loc[1], separator=",", skip_last=True)
 
 img_bool_cropped_camber, img_bool_cropped = cropimage(np.array(np.asarray(img_bool_file2), dtype=bool), np.array(np.asarray(img_bool_file1), dtype=bool))
-# imageVisualization(img_bool_cropped)
+imageVisualization(img_bool_cropped)
 # imageVisualization(img_bool_cropped_camber)
 
 img_bool_cropped_camber, img_bool_cropped = rotate(img_bool_cropped_camber,2), rotate(img_bool_cropped,2)
@@ -582,7 +583,6 @@ print(f"---------- Deflection angles - final ----------\n"
       f"model1: {dft.dangle1 - df1.dangle1:.5f} degrees\n"
       f"model2: {dft.dangle2 - df1.dangle2:.5f} degrees\n"
       f"fem:\n"
-      f"init: {fem_l1.angle:.5f} degrees\n"
-      f"final: {fem_l5.angle:.5f} degrees\n"
-      f"target: {fem_target.angle:.5f} degrees\n"
+      f"fem-fem: {fem_l5.angle - fem_l1.angle:.5f} degrees\n"
+      f"fem-target: {fem_target.angle - fem_l1.angle:.5f} degrees\n"
       f"-----------------------------------------------")
