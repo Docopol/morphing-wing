@@ -324,13 +324,45 @@ for i in range(5):
     BD_axial[i] = axial_strain(newExpDatas[i][0][3][BD_index[0][0]:BD_index[0][1]], newExpDatas[i][0][1][BD_index[1][0]:BD_index[1][1]], newExpDatas[i][1][3][BD_index[0][0]:BD_index[0][1]], newExpDatas[i][1][1][BD_index[1][0]:BD_index[1][1]])
     BD_bending[i] = bending_strain(newExpDatas[i][0][3][BD_index[0][0]:BD_index[0][1]], newExpDatas[i][0][1][BD_index[1][0]:BD_index[1][1]], newExpDatas[i][1][3][BD_index[0][0]:BD_index[0][1]], newExpDatas[i][1][1][BD_index[1][0]:BD_index[1][1]])
 
-'''
-plt.plot(newExpDatas[2][0][3][BD_index[0][0]:BD_index[0][1]], BD_axial, label = 'BD Axial', color = 'b')
-plt.plot(newExpDatas[2][0][3][BD_index[0][0]:BD_index[0][1]], BD_bending, label = 'BD Bending', color = 'hotpink')
-plt.plot(newExpDatas[2][0][2][AC_index[0][0]:AC_index[0][1]], AC_axial, ls = '--', label='AC Axial', color = 'r')
-plt.plot(newExpDatas[2][0][2][AC_index[0][0]:AC_index[0][1]], AC_bending, ls = '--', label='AC Bending', color = 'g')
 
-plt.legend()
-plt.show()
 '''
+bad_indexes[(0,1,2,3) for sections (A,B,C,D)][(0,1,2) for 1st, 2nd and 3rd stiffener gaps]
+
+'''
+bad_lengths = np.array([[0.28,0.39],[0.54,0.65],[0.70,0.77]])
+bad_indexes = np.empty([4], dtype='object')
+
+for i in range(3):
+    bad_indexes[0]=np.append(bad_indexes[0],range(check_closest(bad_lengths[i][0],newExpDatas[0][0][0]),check_closest(bad_lengths[i][1],newExpDatas[0][0][0])))
+    bad_indexes[1]=np.append(bad_indexes[1],range(check_closest(bad_lengths[i][0],newExpDatas[0][0][1]),check_closest(bad_lengths[i][1],newExpDatas[0][0][1])))
+    bad_indexes[2]=np.append(bad_indexes[2],range(check_closest(bad_lengths[i][0],newExpDatas[0][0][2]),check_closest(bad_lengths[i][1],newExpDatas[0][0][2])))
+    bad_indexes[3]=np.append(bad_indexes[3],range(check_closest(bad_lengths[i][0],newExpDatas[0][0][3]),check_closest(bad_lengths[i][1],newExpDatas[0][0][3])))
+
+bad_indexes[0] = np.delete(bad_indexes[0],0).astype(int)
+bad_indexes[1] = np.delete(bad_indexes[1],0).astype(int)
+bad_indexes[2] = np.delete(bad_indexes[2],0).astype(int)
+bad_indexes[3] = np.delete(bad_indexes[3],0).astype(int)
+
+AC_lengths = np.empty([5], dtype='object')
+BD_lengths = np.empty([5], dtype='object')
+for i in range(5):
+    AC_lengths[i] = newExpDatas[i][0][2][AC_index[0][0]:AC_index[0][1]]
+    BD_lengths[i] = newExpDatas[i][0][3][BD_index[0][0]:BD_index[0][1]]
+
+
+#exit()
+
+
+for i in range(5):
+    AC_axial[i] = np.delete(AC_axial[i],bad_indexes[2])
+    AC_lengths[i] = np.delete(AC_lengths[i],bad_indexes[2])
+    BD_axial[i] = np.delete(BD_axial[i],bad_indexes[3])
+    BD_lengths[i] = np.delete(BD_lengths[i],bad_indexes[3])
+
+
+
+plt.plot(AC_lengths[2], AC_axial[2])
+plt.plot(BD_lengths[2], BD_axial[2])
+plt.show()
+
 
