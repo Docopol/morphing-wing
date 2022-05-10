@@ -326,12 +326,6 @@ for i in range(5):
 
 
 '''
-bad_indexes[(0,1,2,3) for sections (A,B,C,D)][(0,1,2) for 1st, 2nd and 3rd stiffener gaps]
-
-'''
-bad_lengths = np.array([[0.28,0.39],[0.54,0.65],[0.70,0.77]])
-bad_indexes = np.empty([4], dtype='object')
-
 for i in range(3):
     bad_indexes[0]=np.append(bad_indexes[0],range(check_closest(bad_lengths[i][0],newExpDatas[0][0][0]),check_closest(bad_lengths[i][1],newExpDatas[0][0][0])))
     bad_indexes[1]=np.append(bad_indexes[1],range(check_closest(bad_lengths[i][0],newExpDatas[0][0][1]),check_closest(bad_lengths[i][1],newExpDatas[0][0][1])))
@@ -342,6 +336,8 @@ bad_indexes[0] = np.delete(bad_indexes[0],0).astype(int)
 bad_indexes[1] = np.delete(bad_indexes[1],0).astype(int)
 bad_indexes[2] = np.delete(bad_indexes[2],0).astype(int)
 bad_indexes[3] = np.delete(bad_indexes[3],0).astype(int)
+'''
+
 
 AC_lengths = np.empty([5], dtype='object')
 BD_lengths = np.empty([5], dtype='object')
@@ -350,19 +346,40 @@ for i in range(5):
     BD_lengths[i] = newExpDatas[i][0][3][BD_index[0][0]:BD_index[0][1]]
 
 
-#exit()
+'''
+bad_indexes[(0,1) for sections (AC, BD)][(0,1,2) for 1st, 2nd and 3rd stiffener gaps]
+'''
 
+bad_lengths = np.array([[0.28,0.39],[0.54,0.65],[0.70,0.77]])
+bad_indexes = np.empty([2], dtype='object')
+
+for i in range(3):
+    bad_indexes[0]=np.append(bad_indexes[0],[check_closest(bad_lengths[i][0],AC_lengths[0]),check_closest(bad_lengths[i][1],AC_lengths[0])]) # This one
+    bad_indexes[1]=np.append(bad_indexes[1],[check_closest(bad_lengths[i][0],BD_lengths[0]),check_closest(bad_lengths[i][1],BD_lengths[0])]) # And this one
+
+bad_indexes[0] = np.delete(bad_indexes[0],0)
+bad_indexes[1] = np.delete(bad_indexes[1],0)
+
+'''
+^^ Above should be working correctly ^^
+'''
 
 for i in range(5):
-    AC_axial[i] = np.delete(AC_axial[i],bad_indexes[2])
-    AC_lengths[i] = np.delete(AC_lengths[i],bad_indexes[2])
-    BD_axial[i] = np.delete(BD_axial[i],bad_indexes[3])
-    BD_lengths[i] = np.delete(BD_lengths[i],bad_indexes[3])
+    AC_lengths[i] = np.split(AC_lengths[i], bad_indexes[0])
+    AC_axial[i] = np.split(AC_axial[i], bad_indexes[0])
+    AC_bending[i] = np.split(AC_bending[i], bad_indexes[0])
+    BD_lengths[i] = np.split(BD_lengths[i], bad_indexes[1])
+    BD_axial[i] = np.split(BD_axial[i], bad_indexes[1])
+    BD_bending[i] = np.split(BD_bending[i], bad_indexes[1])
 
 
+'''
+Plots should have the format displayed below, in order to not show the unusable gaps.
 
-plt.plot(AC_lengths[2], AC_axial[2])
-plt.plot(BD_lengths[2], BD_axial[2])
-plt.show()
+for i in range(0,8,2):
+    plt.plot(AC_lengths[2][i], AC_axial[2][i], color='b')
+    
+'''
+
 
 
