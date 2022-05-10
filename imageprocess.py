@@ -521,7 +521,7 @@ plt.plot(target_camber[0], target_camber[1], color=colors[0], label = 'Final Exp
 #plt.plot(coordinates_skin[0], coordinates_skin[1], label = 'Target FEM Final')
 plt.xlabel("Position in X direction [mm]")
 plt.ylabel("Position in Y direction [mm]")
-plt.legend(bbox_to_anchor = (0.57,0.83))
+plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
 plt.show()
 
 ############################
@@ -537,23 +537,39 @@ loadstep5_coord_x = -1 * loadstep5_coord_x + np.max(loadstep5_coord_x)
 loadstep1_coord_y -= abs(loadstep1_coord_y[0] + loadstep1_coord_y[-1])/2
 loadstep5_coord_y -= abs(loadstep5_coord_y[0] + loadstep5_coord_y[-1])/2
 
-plt.plot(contour[0], contour[1])
-plt.plot(camber[0], camber[1], color=colors[0])
-plt.plot(loadstep1_coord_x, loadstep1_coord_y)
+plt.plot(contour[0], contour[1], label = 'Initial Experimental Contour')
+plt.plot(camber[0], camber[1], color=colors[0], label = 'Initial Experimental Camberline')
+plt.plot(loadstep1_coord_x, loadstep1_coord_y, label = 'Initial FEM Contour')
+plt.xlabel("Position in X direction [mm]")
+plt.ylabel("Position in Y direction [mm]")
+plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
+
+
 plt.grid()
 plt.show()
 
-plt.plot(target_contour[0], target_contour[1])
-plt.plot(target_camber[0], target_camber[1], color=colors[0])
-plt.plot(loadstep5_coord_x, loadstep5_coord_y)
-plt.plot(coordinates_skin[0], coordinates_skin[1])
+#2.initial fem orange, blue intial experiment , camber of inial experiment
+#3.target greem, orange final fem, blue final experiment,
+#4.green target, blue initial fem ,orange final fem
+
+
+plt.plot(target_contour[0], target_contour[1],label = 'Target Contour')
+plt.plot(target_camber[0], target_camber[1], color=colors[0], label = 'Target Camberline')
+plt.plot(loadstep5_coord_x, loadstep5_coord_y, label = 'Final Experimental Contour')
+plt.plot(coordinates_skin[0], coordinates_skin[1], label = 'Final FEM Contour')
 plt.grid()
+plt.xlabel("Position in X direction [mm]")
+plt.ylabel("Position in Y direction [mm]")
+plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
 plt.show()
 
-plt.plot(loadstep1_coord_x, loadstep1_coord_y)
-plt.plot(loadstep5_coord_x, loadstep5_coord_y)
-plt.plot(coordinates_skin[0], coordinates_skin[1])
+plt.plot(loadstep1_coord_x, loadstep1_coord_y, label= 'Initial FEM Contour')
+plt.plot(loadstep5_coord_x, loadstep5_coord_y, label= 'Final FEM Contour')
+plt.plot(coordinates_skin[0], coordinates_skin[1], label= 'Target Contour')
 plt.grid()
+plt.xlabel("Position in X direction [mm]")
+plt.ylabel("Position in Y direction [mm]")
+plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
 plt.show()
 
 
