@@ -53,6 +53,16 @@ v v make graphs v v
 '''
 Axial Strain
 '''
+maxAxial = 0
+maxBending = 0
+
+for i in range (1,5):
+    if max(abs(AC_axial[i][0])) > maxAxial:
+        maxAxial = max(abs(AC_axial[i][0]))
+    if max(abs(AC_bending[i][0])) > maxBending:
+        maxBending = max(abs(AC_bending[i][0]))
+
+print('max axial:', maxAxial, '\nmax bending:', maxBending)
 
 for i in range (1,5):
     plt.figure(i)
