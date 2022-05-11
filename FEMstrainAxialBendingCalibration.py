@@ -9,8 +9,13 @@ e.g. processedFEMData1s [2][:,1] -> gives the strain data from data set 1 for th
 - Ask Mick if confused
 inside = 2, outside = 1
 '''
-processedFEMData1s = processingFEMData.processedFEMData1s
-processedFEMData2s = processingFEMData.processedFEMData2s
+
+processedFEMData1s = processingFEMData.processedFEMData1s 
+processedFEMData2s = processingFEMData.processedFEMData2s 
+
+#conversion to true strain
+processedFEMData1s [:][:,1] = processedFEMData1s [:][:,1] /2
+processedFEMData2s [:][:,1] = processedFEMData2s [:][:,1] /2
 
 
 '''

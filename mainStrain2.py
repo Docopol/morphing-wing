@@ -57,20 +57,22 @@ Axial Strain
 for i in range (1,5):
     plt.figure(i)
     #inside comparison plots experiment vs fem
-    plt.title('Loadstep ' + str(i+1) + ' Experimental vs FEM strains')
+    #plt.title('Loadstep ' + str(i+1) + ' Experimental vs FEM axial strains')
     #plt.plot(#experiment x values, #experiment y values, label = 'Experimental Loop C', color = 'lime', ls = '-.')
-    plt.plot(AC_lengths[i][0], AC_axial[i][0], ls = '--', label='AC Axial', color = 'r')
-    plt.plot(BD_lengths[i][0], BD_axial[i][0], ls = '--', label = 'BD Axial', color = 'b')
+    plt.plot(AC_lengths[i][0], AC_axial[i][0], ls = '--', label='Experimental', color = 'b')
+    #plt.plot(BD_lengths[i][0], BD_axial[i][0], ls = '--', label = 'BD Axial', color = 'b')
     for j in range(2,8,2):
-        plt.plot(AC_lengths[i][j], AC_axial[i][j], ls = '--', color = 'r')
-        plt.plot(BD_lengths[i][j], BD_axial[i][j], ls = '--', color = 'b')
+        plt.plot(AC_lengths[i][j], AC_axial[i][j], ls = '--', color = 'b')
+        #plt.plot(BD_lengths[i][j], BD_axial[i][j], ls = '--', color = 'b')
     
-    plt.plot(np.flip(femNodeLocations[i]), FEMdatas[i][:,1] * 10 ** 6, label = 'FEM', color = 'hotpink')
+    plt.plot(np.flip(femNodeLocations[i]), FEMdatas[i][:,1] * 10 ** 6, label = 'FEM', color = 'r')
     
     plt.ylabel('Axial Microstrain [μm/m]')
     plt.xlabel('Length along contour [m]')
     plt.legend()
-    print(i)
+    plt.ylim((-600,500))
+    plt.savefig('Axial_' + str(i+1))
+
     
 
 '''
@@ -79,20 +81,24 @@ Bending Strain
 
 for i in range (1,5):
     plt.figure(i+4)
+    #plt.title('Loadstep ' + str(i+1) + ' Experimental vs FEM bending strains')
     #inside comparison plots experiment vs fem
     #plt.title('Loadstep vs FEM strains')
     #plt.plot(#experiment x values, #experiment y values, label = 'Experimental Loop C', color = 'lime', ls = '-.')
-    plt.plot(AC_lengths[i][0], AC_bending[i][0], ls = '--', label='AC Bending', color = 'r')
-    plt.plot(BD_lengths[i][0], BD_bending[i][0], ls = '--',label = 'BD Bending', color = 'b')
+    plt.plot(AC_lengths[i][0], AC_bending[i][0], ls = '--', label='Experimental', color = 'b')
+    #plt.plot(BD_lengths[i][0], BD_bending[i][0], ls = '--',label = 'BD Bending', color = 'b')
     for j in range(2,8,2):
-        plt.plot(AC_lengths[i][j], AC_bending[i][j], ls = '--', color = 'r')
-        plt.plot(BD_lengths[i][j], BD_bending[i][j], ls = '--', color = 'b')
+        plt.plot(AC_lengths[i][j], AC_bending[i][j], ls = '--', color = 'b')
+        #plt.plot(BD_lengths[i][j], BD_bending[i][j], ls = '--', color = 'b')
     
-    plt.plot(np.flip(femNodeLocations[i]), FEMdatas[i][:,2] * 10 ** 6, label = 'FEM', color = 'hotpink')
+    plt.plot(np.flip(femNodeLocations[i]), FEMdatas[i][:,2] * 10 ** 6, label = 'FEM', color = 'r')
     
     plt.ylabel('Bending Microstrain [μm/m]')
     plt.xlabel('Length along contour [m]')
     plt.legend()
-    print(i)
+    plt.ylim((-5000,4000))
+
+    plt.savefig('Bending_' + str(i+1))
+
 
 plt.show()
