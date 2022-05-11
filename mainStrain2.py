@@ -81,7 +81,7 @@ for i in range (1,5):
     plt.xlabel('Length along contour [m]')
     plt.legend()
     plt.ylim((-600,500))
-    plt.savefig('Axial_' + str(i+1))
+    #plt.savefig('Axial_' + str(i+1))
 
     
 
@@ -108,7 +108,7 @@ for i in range (1,5):
     plt.legend()
     plt.ylim((-5000,4000))
 
-    plt.savefig('Bending_' + str(i+1))
+    #plt.savefig('Bending_' + str(i+1))
 
 
 plt.show()
