@@ -32,10 +32,13 @@ def imageVisualization(file, show_colorbar:bool = False, name:str = "") -> None:
     """
     visualization an image using plt.imshow()
     """
-    plt.imshow(file, cmap="binary")
-    plt.axis('off')
+    plt.imshow(file, cmap="gist_gray")
+    plt.axis('on')
     if show_colorbar:
         plt.colorbar()
+    plt.xlabel("Position in X direction [pixels]")
+    plt.ylabel("Position in Y direction [pixels]")
+    plt.savefig("images/contour_id", bbox_inches='tight')
     plt.show()
 
 
