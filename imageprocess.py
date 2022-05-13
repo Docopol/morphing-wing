@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -6,7 +5,6 @@ import scipy.interpolate as scp
 import math
 
 from PIL import Image
-from scipy.misc import derivative
 
 from optimalshapeplot import coordinates_skin
 from mainFEMdisp import loadstep1_disp, loadstep5_disp
