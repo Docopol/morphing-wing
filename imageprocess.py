@@ -505,6 +505,8 @@ dft = DeflectionProfiles(camber_target_, centroid_target_)
 ###### Plotting ######
 
 scale = (abs(df1.rootY1 - df1.rootY2)) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1]))
+# scale = abs(df1.rootY1 - df1.rootY2) / ()
+scale -= 0.1425
 
 contour = ((centroid_[0] - midpoint[0]) / scale, (centroid_[1] - midpoint[1]) / scale)
 target_contour = ((centroid_target_[0] - midpoint[0]) / scale, (centroid_target_[1] - midpoint[1]) / scale)
@@ -587,3 +589,8 @@ print(f"---------- Deflection angles - final ----------\n"
       f"fem-fem: {fem_l5.angle - fem_l1.angle:.5f} degrees\n"
       f"fem-target: {fem_target.angle - fem_l1.angle:.5f} degrees\n"
       f"-----------------------------------------------")
+
+plt.plot(loadstep1_coord_x, loadstep1_coord_y)
+plt.plot(loadstep5_coord_x, loadstep5_coord_y)
+plt.plot(coordinates_skin[0], coordinates_skin[1])
+plt.show()
