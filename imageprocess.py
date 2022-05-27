@@ -504,9 +504,12 @@ dft = DeflectionProfiles(camber_target_, centroid_target_)
 
 ###### Plotting ######
 
-scale = (abs(df1.rootY1 - df1.rootY2)) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1]))
-# scale = abs(df1.rootY1 - df1.rootY2) / ()
-scale -= 0.1425
+# scale = (abs(dft.rootY1 - dft.rootY2)) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1]))
+# scale = (abs(dft.rootY1 - dft.rootY2)) / (abs(loadstep1_coord_y[0] - loadstep1_coord_y[-1]))
+# scale /= float.fromhex('0x1.05cfe25873f1fp+0')
+# scale -= 0.1675
+
+scale = float.fromhex('0x1.77779da5f5ffep+2')
 
 contour = ((centroid_[0] - midpoint[0]) / scale, (centroid_[1] - midpoint[1]) / scale)
 target_contour = ((centroid_target_[0] - midpoint[0]) / scale, (centroid_target_[1] - midpoint[1]) / scale)
@@ -540,6 +543,10 @@ loadstep5_coord_x = -1 * loadstep5_coord_x + np.max(loadstep5_coord_x)
 
 loadstep1_coord_y -= abs(loadstep1_coord_y[0] + loadstep1_coord_y[-1])/2
 loadstep5_coord_y -= abs(loadstep5_coord_y[0] + loadstep5_coord_y[-1])/2
+
+# print((abs(loadstep1_coord_y[0] - loadstep1_coord_y[-1])) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1])))
+# print(1-((abs(loadstep5_coord_y[0] - loadstep5_coord_y[-1])) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1])))**-1)
+# print((abs(dft.rootY1 - dft.rootY2)) / (abs(loadstep1_coord_y[0] - loadstep1_coord_y[-1])))
 
 plt.plot(contour[0], contour[1], label = 'Initial Experimental Contour')
 plt.plot(camber[0], camber[1], color=colors[0], label = 'Initial Experimental Camberline')
