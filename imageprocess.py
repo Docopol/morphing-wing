@@ -36,8 +36,9 @@ def imageVisualization(file, show_colorbar:bool = False, name:str = "") -> None:
         plt.colorbar()
     plt.xlabel("Position in X direction [pixels]")
     plt.ylabel("Position in Y direction [pixels]")
-    plt.savefig("images/contour_id", bbox_inches='tight')
+    plt.savefig(f"images/{name}.svg", bbox_inches='tight', format='svg')
     plt.show()
+    plt.close()
 
 
 @perftimer
@@ -472,7 +473,7 @@ img_bool_file1 = load_file(img_bool_loc[0], separator=",", skip_last=True)
 img_bool_file2 = load_file(img_bool_loc[1], separator=",", skip_last=True)
 
 img_bool_cropped_camber, img_bool_cropped = cropimage(np.array(np.asarray(img_bool_file2), dtype=bool), np.array(np.asarray(img_bool_file1), dtype=bool))
-imageVisualization(img_bool_cropped)
+imageVisualization(img_bool_cropped, name="contour_id")
 # imageVisualization(img_bool_cropped_camber)
 
 img_bool_cropped_camber, img_bool_cropped = rotate(img_bool_cropped_camber,2), rotate(img_bool_cropped,2)
@@ -530,7 +531,9 @@ plt.plot(target_camber[0], target_camber[1], color=colors[0], label = 'Final Exp
 plt.xlabel("Position in X direction [mm]")
 plt.ylabel("Position in Y direction [mm]")
 plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
+plt.savefig("images\IEvsFE.svg", dpi='figure', format='svg')
 plt.show()
+plt.close()
 
 ############################
 
@@ -556,10 +559,10 @@ plt.plot(loadstep1_coord_x, loadstep1_coord_y, label = 'Initial FEM Contour')
 plt.xlabel("Position in X direction [mm]")
 plt.ylabel("Position in Y direction [mm]")
 plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
-
-
 plt.grid()
+plt.savefig("images\IEvsIF.svg", dpi='figure', format='svg')
 plt.show()
+plt.close()
 
 #2.initial fem orange, blue intial experiment , camber of inial experiment
 #3.target greem, orange final fem, blue final experiment,
@@ -574,7 +577,9 @@ plt.grid()
 plt.xlabel("Position in X direction [mm]")
 plt.ylabel("Position in Y direction [mm]")
 plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
+plt.savefig("images\FEvsFFvsT.svg", dpi='figure', format='svg')
 plt.show()
+plt.close()
 
 plt.plot(loadstep1_coord_x, loadstep1_coord_y, label= 'Initial FEM Contour')
 plt.plot(loadstep5_coord_x, loadstep5_coord_y, label= 'Final FEM Contour')
@@ -583,6 +588,7 @@ plt.grid()
 plt.xlabel("Position in X direction [mm]")
 plt.ylabel("Position in Y direction [mm]")
 plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
+plt.savefig("images\IFvsFFvsT.svg", dpi='figure', format='svg')
 plt.show()
 
 
