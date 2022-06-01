@@ -36,8 +36,9 @@ def imageVisualization(file, show_colorbar:bool = False, name:str = "") -> None:
         plt.colorbar()
     plt.xlabel("Position in X direction [pixels]")
     plt.ylabel("Position in Y direction [pixels]")
-    plt.savefig("images/contour_id", bbox_inches='tight')
+    plt.savefig(f"images/{name}.svg", bbox_inches='tight', format='svg')
     plt.show()
+    plt.close()
 
 
 @perftimer
@@ -472,7 +473,7 @@ img_bool_file1 = load_file(img_bool_loc[0], separator=",", skip_last=True)
 img_bool_file2 = load_file(img_bool_loc[1], separator=",", skip_last=True)
 
 img_bool_cropped_camber, img_bool_cropped = cropimage(np.array(np.asarray(img_bool_file2), dtype=bool), np.array(np.asarray(img_bool_file1), dtype=bool))
-imageVisualization(img_bool_cropped)
+imageVisualization(img_bool_cropped, name="contour_id")
 # imageVisualization(img_bool_cropped_camber)
 
 img_bool_cropped_camber, img_bool_cropped = rotate(img_bool_cropped_camber,2), rotate(img_bool_cropped,2)
@@ -504,7 +505,13 @@ dft = DeflectionProfiles(camber_target_, centroid_target_)
 
 ###### Plotting ######
 
-scale = (abs(df1.rootY1 - df1.rootY2)) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1]))
+# scale = (abs(dft.rootY1 - dft.rootY2)) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1]))
+# scale = (abs(dft.rootY1 - dft.rootY2)) / (abs(loadstep1_coord_y[0] - loadstep1_coord_y[-1]))
+# scale /= float.fromhex('0x1.05cfe25873f1fp+0')
+# scale -= 0.1675
+
+#scale = float.fromhex('0x1.77779da5f5ffep+2')
+scale = float.fromhex('0x1.7258a92a32800p+2')
 
 contour = ((centroid_[0] - midpoint[0]) / scale, (centroid_[1] - midpoint[1]) / scale)
 target_contour = ((centroid_target_[0] - midpoint[0]) / scale, (centroid_target_[1] - midpoint[1]) / scale)
@@ -524,7 +531,9 @@ plt.plot(target_camber[0], target_camber[1], color=colors[0], label = 'Final Exp
 plt.xlabel("Position in X direction [mm]")
 plt.ylabel("Position in Y direction [mm]")
 plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
+plt.savefig("images\IEvsFE.svg", dpi='figure', format='svg')
 plt.show()
+plt.close()
 
 ############################
 
@@ -539,16 +548,21 @@ loadstep5_coord_x = -1 * loadstep5_coord_x + np.max(loadstep5_coord_x)
 loadstep1_coord_y -= abs(loadstep1_coord_y[0] + loadstep1_coord_y[-1])/2
 loadstep5_coord_y -= abs(loadstep5_coord_y[0] + loadstep5_coord_y[-1])/2
 
+# print((abs(loadstep1_coord_y[0] - loadstep1_coord_y[-1])) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1])))
+# print(1-((abs(loadstep5_coord_y[0] - loadstep5_coord_y[-1])) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1])))**-1)
+# print((abs(df1.rootY1 - df1.rootY2)) / (abs(loadstep1_coord_y[0] - loadstep1_coord_y[-1])))
+# print((abs(dft.rootY1 - dft.rootY2)) / (abs(loadstep5_coord_y[0] - loadstep5_coord_y[-1])))
+
 plt.plot(contour[0], contour[1], label = 'Initial Experimental Contour')
 plt.plot(camber[0], camber[1], color=colors[0], label = 'Initial Experimental Camberline')
 plt.plot(loadstep1_coord_x, loadstep1_coord_y, label = 'Initial FEM Contour')
 plt.xlabel("Position in X direction [mm]")
 plt.ylabel("Position in Y direction [mm]")
 plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
-
-
 plt.grid()
+plt.savefig("images\IEvsIF.svg", dpi='figure', format='svg')
 plt.show()
+plt.close()
 
 #2.initial fem orange, blue intial experiment , camber of inial experiment
 #3.target greem, orange final fem, blue final experiment,
@@ -563,7 +577,9 @@ plt.grid()
 plt.xlabel("Position in X direction [mm]")
 plt.ylabel("Position in Y direction [mm]")
 plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
+plt.savefig("images\FEvsFFvsT.svg", dpi='figure', format='svg')
 plt.show()
+plt.close()
 
 plt.plot(loadstep1_coord_x, loadstep1_coord_y, label= 'Initial FEM Contour')
 plt.plot(loadstep5_coord_x, loadstep5_coord_y, label= 'Final FEM Contour')
@@ -572,6 +588,7 @@ plt.grid()
 plt.xlabel("Position in X direction [mm]")
 plt.ylabel("Position in Y direction [mm]")
 plt.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2)
+plt.savefig("images\IFvsFFvsT.svg", dpi='figure', format='svg')
 plt.show()
 
 
@@ -587,3 +604,8 @@ print(f"---------- Deflection angles - final ----------\n"
       f"fem-fem: {fem_l5.angle - fem_l1.angle:.5f} degrees\n"
       f"fem-target: {fem_target.angle - fem_l1.angle:.5f} degrees\n"
       f"-----------------------------------------------")
+
+# plt.plot(loadstep1_coord_x, loadstep1_coord_y)
+# plt.plot(loadstep5_coord_x, loadstep5_coord_y)
+# plt.plot(coordinates_skin[0], coordinates_skin[1])
+# plt.show()
