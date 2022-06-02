@@ -554,8 +554,8 @@ loadstep5_coord_y -= abs(loadstep5_coord_y[0] + loadstep5_coord_y[-1])/2
 
 # print((abs(loadstep1_coord_y[0] - loadstep1_coord_y[-1])) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1])))
 # print(1-((abs(loadstep5_coord_y[0] - loadstep5_coord_y[-1])) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1])))**-1)
-print((abs(df1.rootY1 - df1.rootY2)) / (abs(loadstep1_coord_y[0] - loadstep1_coord_y[-1])))
-print((abs(dft.rootY1 - dft.rootY2)) / (abs(loadstep5_coord_y[0] - loadstep5_coord_y[-1])))
+#print((abs(df1.rootY1 - df1.rootY2)) / (abs(loadstep1_coord_y[0] - loadstep1_coord_y[-1])))
+#print((abs(dft.rootY1 - dft.rootY2)) / (abs(loadstep5_coord_y[0] - loadstep5_coord_y[-1])))
 
 plt.plot(contour[0], contour[1], label = 'Initial Experimental Contour')
 plt.plot(camber[0], camber[1], color=colors[0], label = 'Initial Experimental Camberline')
