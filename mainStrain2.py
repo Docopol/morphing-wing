@@ -1,7 +1,6 @@
 from tracemalloc import stop
 import pandas as pd
 import numpy as np
-import main
 import matplotlib.pyplot as plt
 import FEMstrainAxialBendingCalibration
 import mainFEMdisp

@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import main
 import matplotlib.pyplot as plt
 import processingFEMData_manualMatrix as processingFEMData
 import mainFEMdisp
@@ -38,7 +37,7 @@ v v make graphs v v
 
 '''
 uncalibrated plots
-'''
+''''''
 for i in range (5):
     fig, ax = plt.subplots(2,2)
     title = str('Uncalibrated Loadstep ' + str (i+1))
@@ -93,30 +92,30 @@ for i in range (5):
 plt.legend()
 
 plt.show()
+
 '''
 
-
 #symmetry analysis experiment (bending analysis) A-C
-plt.plot (experimentDatas[timeStamps[2]][0][0], experimentDatas[timeStamps[2]][1][0],label = 'Outside', color = 'orange')
-plt.plot (experimentDatas[timeStamps[2]][0][2], [-x for x in experimentDatas[timeStamps[2]][1][2]], label = 'Inside', color = 'blue', ls = '--')
+plt.plot (experimentDatas[timeStamps[1]][0][0], experimentDatas[timeStamps[1]][1][0],label = 'Outside Experimental', color = 'orange')
+plt.plot (experimentDatas[timeStamps[1]][0][2], [-x for x in experimentDatas[timeStamps[1]][1][2]], label = 'Inside Experimental[-1*]', color = 'blue', ls = '--')
+plt.plot(np.flip(femNodeLocations[1]), processedFEMData1s [1][:,1]* 10 ** 6, label = 'Outside FEM', color = 'red', ls = ':')
+plt.plot(np.flip(femNodeLocations[1]), [-x* 10 ** 6 for x in processedFEMData2s [1][:,1]], label = 'Inside FEM[-1*]', color = 'green', ls= '-.') #"calibration" is the - part
+
 
 plt.ylabel('Microstrain [μm/m]')
 plt.xlabel('Length along contour [m]')
 plt.legend()
-plt.savefig('figSymmetryAnalaysis1.png')
+plt.savefig('figSymmetryAnalaysisLoadstep2.png')
 
 #symmetry analysis experiment (bending analysis) #negative has to be taken
 
 plt.clf()
-plt.plot (experimentDatas[timeStamps[2]][0][1], experimentDatas[timeStamps[2]][1][1],label = 'Outside', color = 'orange')
-plt.plot (experimentDatas[timeStamps[2]][0][3], [-x for x in experimentDatas[timeStamps[2]][1][3]], label = 'Inside', color = 'blue', ls = '--')
+plt.plot (experimentDatas[timeStamps[4]][0][0], experimentDatas[timeStamps[4]][1][0],label = 'Outside Experimental', color = 'orange')
+plt.plot (experimentDatas[timeStamps[4]][0][2], [-x for x in experimentDatas[timeStamps[4]][1][2]], label = 'Inside Experimental[-1*]', color = 'blue', ls = '--')
+plt.plot(np.flip(femNodeLocations[4]), processedFEMData1s [4][:,1]* 10 ** 6, label = 'Outside FEM', color = 'red', ls = ':')
+plt.plot(np.flip(femNodeLocations[4]), [-x* 10 ** 6 for x in processedFEMData2s [4][:,1]], label = 'Inside FEM[-1*]', color = 'green', ls= '-.') #"calibration" is the - part
 
 plt.ylabel('Microstrain [μm/m]')
 plt.xlabel('Length along contour [m]')
 plt.legend()
-plt.savefig('figSymmetryAnalaysis2.png')
-
-
-# ax[1, 1].set(xlim=(0, 8), xticks=np.arange(1, 8),
-#              ylim=(0, 8), yticks=np.arange(1, 8))
-'''
+plt.savefig('figSymmetryAnalaysisLoadstep5.png')
