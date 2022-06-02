@@ -482,7 +482,7 @@ camber_ = addcamber(img_bool_cropped_camber)[0]
 #plotBool(rotate(img_bool_cropped,3))
 img_grid = creategrid(img_bool_cropped)
 centroid_ = regress(img_grid)
-
+centroid_ = centroid_[:,3:-1]
 df1 = DeflectionProfiles(camber_, centroid_)
 midpoint = (df1.camberline[0][0], df1.camberline[1][0])
 # print(df1.__dict__)
@@ -499,7 +499,7 @@ img_bool_cropped_camber_target, img_bool_cropped_target = rotate(img_bool_croppe
 camber_target_, translate_target = addcamber(img_bool_cropped_camber_target, True)
 img_grid_target = creategrid(img_bool_cropped_target)
 centroid_target_ = regress(img_grid_target, True)
-
+centroid_target_ = centroid_target_[:,3:-1]
 dft = DeflectionProfiles(camber_target_, centroid_target_)
 # print(dft.__dict__)
 
@@ -511,7 +511,8 @@ dft = DeflectionProfiles(camber_target_, centroid_target_)
 # scale -= 0.1675
 
 #scale = float.fromhex('0x1.77779da5f5ffep+2')
-scale = float.fromhex('0x1.7258a92a32800p+2')
+#scale = float.fromhex('0x1.716be38283569p+2')
+scale = 5.726918771213991
 
 contour = ((centroid_[0] - midpoint[0]) / scale, (centroid_[1] - midpoint[1]) / scale)
 target_contour = ((centroid_target_[0] - midpoint[0]) / scale, (centroid_target_[1] - midpoint[1]) / scale)
@@ -521,8 +522,8 @@ target_camber = ((camber_target_[0] - midpoint[0]) / scale, (camber_target_[1] -
 #red_patch = mpatches.Patch(color='orange', label='Target shape')
 #blue_patch = mpatches.Patch(color='blue', label='Initial pos')
 #plt.legend(handles=[red_patch, blue_patch])
-plt.grid()
 
+plt.grid()
 plt.plot(contour[0], contour[1], label = 'Initial Experimental Contour')
 plt.plot(target_contour[0], target_contour[1], label = 'Final Experimental Contour')
 plt.plot(camber[0], camber[1], color=colors[1],linestyle='--', dashes=(2, 2), label = 'Initial Experimental Camberline')
@@ -551,7 +552,7 @@ loadstep5_coord_y -= abs(loadstep5_coord_y[0] + loadstep5_coord_y[-1])/2
 # print((abs(loadstep1_coord_y[0] - loadstep1_coord_y[-1])) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1])))
 # print(1-((abs(loadstep5_coord_y[0] - loadstep5_coord_y[-1])) / (abs(coordinates_skin[1][0] - coordinates_skin[1][-1])))**-1)
 # print((abs(df1.rootY1 - df1.rootY2)) / (abs(loadstep1_coord_y[0] - loadstep1_coord_y[-1])))
-# print((abs(dft.rootY1 - dft.rootY2)) / (abs(loadstep5_coord_y[0] - loadstep5_coord_y[-1])))
+#print((abs(dft.rootY1 - dft.rootY2)) / (abs(loadstep5_coord_y[0] - loadstep5_coord_y[-1])))
 
 plt.plot(contour[0], contour[1], label = 'Initial Experimental Contour')
 plt.plot(camber[0], camber[1], color=colors[0], label = 'Initial Experimental Camberline')
