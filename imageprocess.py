@@ -573,10 +573,10 @@ plt.close()
 #4.green target, blue initial fem ,orange final fem
 
 
-plt.plot(target_contour[0], target_contour[1],label = 'Target Contour')
-plt.plot(target_camber[0], target_camber[1], color=colors[0], label = 'Target Camberline')
-plt.plot(loadstep5_coord_x, loadstep5_coord_y, label = 'Final Experimental Contour')
-plt.plot(coordinates_skin[0], coordinates_skin[1], label = 'Final FEM Contour')
+plt.plot(target_contour[0], target_contour[1],label = 'Final Experimental Contour')
+plt.plot(target_camber[0], target_camber[1], color=colors[0], label = 'Final Experimental Camberline')
+plt.plot(loadstep5_coord_x, loadstep5_coord_y, label = 'Final FEM Contour')
+plt.plot(coordinates_skin[0], coordinates_skin[1], label = 'Target Contour')
 plt.grid()
 plt.xlabel("Position in X direction [mm]")
 plt.ylabel("Position in Y direction [mm]")
